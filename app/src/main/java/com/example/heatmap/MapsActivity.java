@@ -11,6 +11,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import data.model.GooglePlace;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -39,8 +44,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //LatLng sydney = new LatLng(-34, 151);
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng etsinf = new LatLng(39.48305714751131, -0.34783486024869137);
+        mMap.addMarker(new MarkerOptions().position(etsinf).title("Etsinf"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(etsinf));
+        mMap.setMinZoomPreference(14.0f);
+        mMap.setMaxZoomPreference(20.0f);
+
+        List<GooglePlace> googlePlaces = new ArrayList<>();
+        HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
+        GooglePlace googlePlace = new GooglePlace();
+        List<Float> coords = new ArrayList<>();
+        coords.add(39.48305714751131f);
+        coords.add(-0.34783486024869137f);
+        googlePlace.setCoords(coords);
+        googlePlace.setCurrentPopularity(30);
+        //heatmapDrawer.drawCircle(googlePlace);
+        googlePlaces.add(googlePlace);
+
+        googlePlace = new GooglePlace();
+        coords = new ArrayList<>();
+        coords.add(39.48232417821347f);
+        coords.add(-0.3487664561099621f);
+        googlePlace.setCoords(coords);
+        googlePlace.setCurrentPopularity(5);
+        //heatmapDrawer.drawCircle(googlePlace);
+        googlePlaces.add(googlePlace);
+
+        googlePlace = new GooglePlace();
+        coords = new ArrayList<>();
+        coords.add(39.48281274006481f);
+        coords.add(-0.3468889099088923f);
+        googlePlace.setCoords(coords);
+        googlePlace.setCurrentPopularity(15);
+        //heatmapDrawer.drawCircle(googlePlace);
+        googlePlaces.add(googlePlace);
+
+        googlePlace = new GooglePlace();
+        coords = new ArrayList<>();
+        coords.add(39.483831256278556f);
+        coords.add(-0.3468567234025883f);
+        googlePlace.setCoords(coords);
+        googlePlace.setCurrentPopularity(20);
+        //heatmapDrawer.drawCircle(googlePlace);
+        googlePlaces.add(googlePlace);
+
+        heatmapDrawer.makeHeatMap(googlePlaces);
     }
 }
