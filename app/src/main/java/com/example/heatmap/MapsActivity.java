@@ -5,38 +5,65 @@ import androidx.fragment.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.example.heatmap.connections.restservice.LatLngService;
 import com.example.heatmap.connections.restservice.ParametersPT;
 import com.example.heatmap.connections.restservice.PopularTimesService;
+import com.example.heatmap.databinding.ActivityMapsBinding;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import data.model.GooglePlace;
 
 import java.io.IOException;
 
+import static android.content.ContentValues.TAG;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    private final String apiKey = "AIzaSyBC5WXRHQ7fKL96InPGDLXPrpztFFYcpLg";
+    private ActivityMapsBinding binding;
     private GoogleMap mMap;
+    private PlacesClient placesClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        binding = ActivityMapsBinding.inflate(getLayoutInflater());
+
+        initializePlaces(apiKey);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(binding.map.getId());
         mapFragment.getMapAsync(this);
 
 
@@ -79,6 +106,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
+    }
+
+    private void initializePlaces(String apiKey) {
+        // Initialize Places client
+        Places.initialize(getApplicationContext(), apiKey);
+        placesClient = Places.createClient(this);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(binding.autocompleteFragment.getId());
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NotNull Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(getLatLng(place.getId())));
+            }
+
+            @Override
+            public void onError(@NotNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
+    }
+
+    private LatLng getLatLng(String placeId) {
+        LatLngService latLngService = LatLngService.getInstance();
+        Call<ResponseBody> response  = latLngService.getLatLng(apiKey, placeId);
+
+        try {
+            //TODO: cambiar execute por enqueue
+            Response<ResponseBody> responseHttp = response.execute();
+            Double[] latLng = arrayLatLng(responseHttp.body().string());
+            return new LatLng(latLng[0],latLng[1]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private Double[] arrayLatLng(String response) throws JSONException {
+        JSONObject responseJson = new JSONObject(response);
+        JSONArray arrayJson = responseJson.getJSONArray("results");
+        JSONObject location = arrayJson.getJSONObject(0)
+                .getJSONObject("geometry")
+                .getJSONObject("location");
+
+        return new Double[]{location.getDouble("lat"),
+                            location.getDouble("lng")};
     }
 
     /**
