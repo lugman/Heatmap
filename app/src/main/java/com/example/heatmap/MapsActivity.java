@@ -12,10 +12,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import data.model.GooglePlace;
@@ -36,9 +38,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Places.initialize(getApplicationContext(), "AIzaSyBC5WXRHQ7fKL96InPGDLXPrpztFFYcpLg");
         placesClient = Places.createClient(this);
         // Initialize the AutocompleteSupportFragment.
-
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-        getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        getSupportFragmentManager().findFragmentById(binding.autocompleteFragment.getId());
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
