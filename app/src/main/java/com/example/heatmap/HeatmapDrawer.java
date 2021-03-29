@@ -40,8 +40,8 @@ public class HeatmapDrawer {
         public void makeHeatMap(List<GooglePlace> googlePlaces){
             List<WeightedLatLng> weightedLatLngs = new ArrayList<>();
             for(int i = 0; i< googlePlaces.size(); i++){
-                float lat = googlePlaces.get(i).getCoords().get(0);
-                float lng = googlePlaces.get(i).getCoords().get(1);
+                float lat = googlePlaces.get(i).getLatitude();
+                float lng = googlePlaces.get(i).getLongitude();
                 int popularity = googlePlaces.get(i).getCurrentPopularity();
                 weightedLatLngs.add(new WeightedLatLng(new LatLng(lat,lng), popularity) );
             }
@@ -68,7 +68,7 @@ public class HeatmapDrawer {
         }
 
         public void drawCircle(GooglePlace googlePlace){
-            LatLng latLng = new LatLng(googlePlace.getCoords().get(0),googlePlace.getCoords().get(1));
+            LatLng latLng = new LatLng(googlePlace.getLatitude(),googlePlace.getLongitude());
             int popularity = googlePlace.getCurrentPopularity();
             drawCircle(latLng, popularity);
         }

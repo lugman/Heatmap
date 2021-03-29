@@ -3,7 +3,10 @@ package com.example.heatmap;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 
+import com.example.heatmap.connections.restservice.ParametersPT;
+import com.example.heatmap.connections.restservice.PopularTimesService;
 import com.example.heatmap.databinding.ActivityMapsBinding;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,18 +25,26 @@ import java.util.List;
 
 import data.model.GooglePlace;
 
+import java.io.IOException;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private ActivityMapsBinding binding;
     private GoogleMap mMap;
     private PlacesClient placesClient;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
-        
+
 
         Places.initialize(getApplicationContext(), "AIzaSyBC5WXRHQ7fKL96InPGDLXPrpztFFYcpLg");
         placesClient = Places.createClient(this);
@@ -49,6 +60,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(binding.map.getId());
         mapFragment.getMapAsync(this);
+
+
+
+        /*
+                    EJEMPLO DE LLAMADA A LA API.
+        */
+
+        PopularTimesService populartimesService = new PopularTimesService();
+
+//        Call<ResponseBody> response2 = populartimesService.get(new ParametersPT(new String[]{"bar"},new double[]{48.132986, 11.566126},new double[]{48.142199, 11.580047,},60,90));
+        Call<GooglePlace> response  = populartimesService.get_id(new ParametersPT("ChIJSYuuSx9awokRyrrOFTGg0GY"));
+
+//        response2.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                try {
+//                    Log.d("Response", response.body().string());
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Log.d("Response", "No va");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                Log.d("Response", "ERROR "+t.toString());
+//            }
+//        });
+
+        response.enqueue(new Callback<GooglePlace>() {
+            @Override
+            public void onResponse(Call<GooglePlace> call, Response<GooglePlace> response) {
+                Log.d("Response","res");
+            }
+
+            @Override
+            public void onFailure(Call<GooglePlace> call, Throwable t) {
+                Log.d("Response",t.getLocalizedMessage());
+            }
+        });
+
+
+
+
     }
 
     /**
@@ -77,43 +133,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<GooglePlace> googlePlaces = new ArrayList<>();
         HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
         GooglePlace googlePlace = new GooglePlace();
-        List<Float> coords = new ArrayList<>();
-        coords.add(39.48305714751131f);
-        coords.add(-0.34783486024869137f);
-        googlePlace.setCoords(coords);
+        googlePlace.setLatitude(39.48305714751131f);
+        googlePlace.setLongitude(-0.34783486024869137f);
         googlePlace.setCurrentPopularity(30);
         //heatmapDrawer.drawCircle(googlePlace);
         googlePlaces.add(googlePlace);
 
         googlePlace = new GooglePlace();
-        coords = new ArrayList<>();
-        coords.add(39.48232417821347f);
-        coords.add(-0.3487664561099621f);
-        googlePlace.setCoords(coords);
-        googlePlace.setCurrentPopularity(5);
+
+        googlePlace.setLatitude(39.48232417821347f);
+        googlePlace.setLongitude(-0.3487664561099621f);
         //heatmapDrawer.drawCircle(googlePlace);
         googlePlaces.add(googlePlace);
+        googlePlace.setCurrentPopularity(30);
 
         googlePlace = new GooglePlace();
-        coords = new ArrayList<>();
-        coords.add(39.48281274006481f);
-        coords.add(-0.3468889099088923f);
-        googlePlace.setCoords(coords);
-        googlePlace.setCurrentPopularity(15);
+
+        googlePlace.setLatitude(39.48281274006481f);
+        googlePlace.setLongitude(-0.3468889099088923f);
         //heatmapDrawer.drawCircle(googlePlace);
         googlePlaces.add(googlePlace);
+        googlePlace.setCurrentPopularity(30);
 
         googlePlace = new GooglePlace();
-        coords = new ArrayList<>();
-        coords.add(39.483831256278556f);
-        coords.add(-0.3468567234025883f);
-        googlePlace.setCoords(coords);
+
+        googlePlace.setLatitude(39.483831256278556f);
+        googlePlace.setLongitude(-0.3468567234025883f);
         googlePlace.setCurrentPopularity(20);
         //heatmapDrawer.drawCircle(googlePlace);
         googlePlaces.add(googlePlace);
 
         heatmapDrawer.makeHeatMap(googlePlaces);
     }
-
-
 }
