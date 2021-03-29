@@ -1,5 +1,7 @@
 package com.example.heatmap.connections.restservice;
 
+import java.util.List;
+
 import data.model.GooglePlace;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -11,7 +13,7 @@ public interface PopularTimesApi {
 
     @Headers({"Content-Type: application/json"})
     @POST("getpopulartimes")
-    Call<ResponseBody> get(@Body ParametersPT body);
+    Call<List<GooglePlace>> get(@Body ParametersPT body);
 
     @Headers({"Content-Type: application/json"})
     @POST("getpopulartimes")

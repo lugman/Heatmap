@@ -1,6 +1,11 @@
 package com.example.heatmap.connections.restservice;
 
 import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import data.model.GooglePlace;
@@ -17,22 +22,28 @@ public class PopularTimesService implements PopularTimesApi {
     private static PopularTimesService instance;
 
 
-    public PopularTimesService() {
+    private PopularTimesService() {
         final OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(20, TimeUnit.SECONDS)
                 .writeTimeout(20, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
+
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
         populartimesApi = retrofit.create(PopularTimesApi.class);
 
     }
+
     public static PopularTimesService getInstance(){
         if (instance == null){
             instance = new PopularTimesService();
@@ -53,7 +64,7 @@ public class PopularTimesService implements PopularTimesApi {
      *  </ul>
      */
     @Override
-    public Call<ResponseBody> get(ParametersPT parametersPT) {
+    public Call<List<GooglePlace>> get(ParametersPT parametersPT) {
         if (parametersPT.p1.length != 2 || parametersPT.p2.length !=2){
                 Log.e("ERROR","Argumento p1 o p2 incorrecto.");
                 return null;
