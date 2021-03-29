@@ -35,7 +35,7 @@ public class GooglePlace {
     private Coordinates coordinates;
 
     //HashMap<dayOfWeek><data<Integer>>  -  same as popularTimes but with waiting time
-    private Map<String,List<Integer>> timeWait;
+    private List<ItemPopularTimes> time_wait;
     private double rating;
     private int currentPopularity;
     //Commented because no clear example on popularity data from web.
@@ -119,12 +119,12 @@ public class GooglePlace {
         this.populartimes = populartimes;
     }
 
-    public Map<String, List<Integer>> getTimeWait() {
-        return timeWait;
+    public List<ItemPopularTimes> getTimeWait() {
+        return time_wait;
     }
 
-    public void setTimeWait(Map<String, List<Integer>> timeWait) {
-        this.timeWait = timeWait;
+    public void setTimeWait(List<ItemPopularTimes> time_wait) {
+        this.time_wait = time_wait;
     }
 
     public double getRating() {
