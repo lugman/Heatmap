@@ -72,33 +72,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     EJEMPLO DE LLAMADA A LA API.
         */
 
-        PopularTimesService populartimesService = new PopularTimesService();
+        PopularTimesService populartimesService =  PopularTimesService.getInstance();
 
-//        Call<ResponseBody> response2 = populartimesService.get(new ParametersPT(new String[]{"bar"},new double[]{48.132986, 11.566126},new double[]{48.142199, 11.580047,},60,90));
+        Call<List<GooglePlace>> response2 = populartimesService.get(new ParametersPT(new String[]{"bar"},new double[]{48.132986, 11.566126},new double[]{48.142199, 11.580047,},60,90));
         Call<GooglePlace> response  = populartimesService.get_id(new ParametersPT("ChIJSYuuSx9awokRyrrOFTGg0GY"));
 
-//        response2.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                try {
-//                    Log.d("Response", response.body().string());
-//
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    Log.d("Response", "No va");
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                Log.d("Response", "ERROR "+t.toString());
-//            }
-//        });
+        response2.enqueue(new Callback<List<GooglePlace>>() {
+            @Override
+            public void onResponse(Call<List<GooglePlace>> call, Response<List<GooglePlace>> response) {
+
+                Log.d("Response List", response.body().get(0).getLatitude().toString());
+            }
+
+            @Override
+            public void onFailure(Call<List<GooglePlace>> call, Throwable t) {
+
+            }
+
+        });
 
         response.enqueue(new Callback<GooglePlace>() {
             @Override
             public void onResponse(Call<GooglePlace> call, Response<GooglePlace> response) {
-                Log.d("Response","res");
+                Log.d("Response", String.valueOf(response.body().getTimeWait()));
             }
 
             @Override

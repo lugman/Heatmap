@@ -2,7 +2,7 @@ package data.model;
 
 import androidx.annotation.NonNull;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -16,14 +16,23 @@ public class GooglePlace {
     private String address;
     @NonNull
     private List<String> types;
-    @NonNull
-    private Float latitude;
-    @NonNull
-    private Float longitude;
+
     //popularTimes<dayOfWeek><data<Integer>>
     //data is an array of 24 integers corresponding to hours of the day. Each integer ranges from 0-100
     @NonNull
-    private Map<String,List<Integer>> popularTimes;
+    private List<ItemPopularTimes> populartimes;
+
+    @NonNull
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(@NonNull Coordinates coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    @NonNull
+    private Coordinates coordinates;
 
     //HashMap<dayOfWeek><data<Integer>>  -  same as popularTimes but with waiting time
     private Map<String,List<Integer>> timeWait;
@@ -31,38 +40,38 @@ public class GooglePlace {
     private int currentPopularity;
     //Commented because no clear example on popularity data from web.
    // private int popularity;
-    private int ratingN;
-    private String phoneNum;
-    private List<Integer> timeSpent;
+    private int rating_n;
 
-    public GooglePlace(@NonNull String id,@NonNull String name,@NonNull String address,@NonNull List<String> types,@NonNull Float latitude, @NonNull Float longitude,@NonNull Map<String,List<Integer>> popularTimes){
+    private String international_phone_number;
+    private List<Integer> time_spent;
+
+    public GooglePlace(@NonNull String id,@NonNull String name,@NonNull String address,@NonNull List<String> types,@NonNull List<ItemPopularTimes> populartimes,@NonNull Coordinates coordinates){
         this.id = id;
         this.name = name;
         this.address = address;
         this.types = types;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.popularTimes = popularTimes;
+        this.populartimes = populartimes;
+        this.coordinates= coordinates;
     }
     public GooglePlace(){
+        this.coordinates= new Coordinates();
+    }
+
+    public void setLatitude(float latitude){
+        coordinates.lat=latitude;
+    }
+    public void setLongitude(float longitude){
+        coordinates.lng=longitude;
     }
 
     @NonNull
     public Float getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(@NonNull Float latitude) {
-        this.latitude = latitude;
+        return coordinates.lat;
     }
 
     @NonNull
     public Float getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(@NonNull Float longitude) {
-        this.longitude = longitude;
+        return coordinates.lng;
     }
 
     @NonNull
@@ -102,12 +111,12 @@ public class GooglePlace {
     }
 
     @NonNull
-    public Map<String, List<Integer>> getPopularTimes() {
-        return popularTimes;
+    public List<ItemPopularTimes> getPopulartimes() {
+        return populartimes;
     }
 
-    public void setPopularTimes(@NonNull Map<String, List<Integer>> popularTimes) {
-        this.popularTimes = popularTimes;
+    public void setPopulartimes(@NonNull List<ItemPopularTimes> populartimes) {
+        this.populartimes = populartimes;
     }
 
     public Map<String, List<Integer>> getTimeWait() {
@@ -126,28 +135,28 @@ public class GooglePlace {
         this.rating = rating;
     }
 
-    public int getRatingN() {
-        return ratingN;
+    public int getRating_n() {
+        return rating_n;
     }
 
-    public void setRatingN(int ratingN) {
-        this.ratingN = ratingN;
+    public void setRating_n(int rating_n) {
+        this.rating_n = rating_n;
     }
 
-    public String getPhoneNum() {
-        return phoneNum;
+    public String getInternational_phone_number() {
+        return international_phone_number;
     }
 
-    public void setPhoneNum(String phoneNum) {
-        this.phoneNum = phoneNum;
+    public void setInternational_phone_number(String international_phone_number) {
+        this.international_phone_number = international_phone_number;
     }
 
-    public List<Integer> getTimeSpent() {
-        return timeSpent;
+    public List<Integer> getTime_spent() {
+        return time_spent;
     }
 
-    public void setTimeSpent(List<Integer> timeSpent) {
-        this.timeSpent = timeSpent;
+    public void setTime_spent(List<Integer> time_spent) {
+        this.time_spent = time_spent;
     }
 
     public int getCurrentPopularity() {
@@ -156,6 +165,58 @@ public class GooglePlace {
 
     public void setCurrentPopularity(int currentPopularity) {
         this.currentPopularity = currentPopularity;
+    }
+
+
+    class ItemPopularTimes{
+        String name;
+        int data[];
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int[] getData() {
+            return data;
+        }
+
+        public void setData(int[] data) {
+            this.data = data;
+        }
+
+        @Override
+        public String toString() {
+            return "ItemPopularTimes{" +
+                    "name='" + name + '\'' +
+                    ", data=" + Arrays.toString(data) +
+                    '}';
+        }
+    }
+
+    class Coordinates{
+        float lng;
+        float lat;
+
+        public float getLng() {
+            return lng;
+        }
+
+        public void setLng(float lng) {
+            this.lng = lng;
+        }
+
+        public float getLat() {
+            return lat;
+        }
+
+        public void setLat(float lat) {
+            this.lat = lat;
+        }
+
     }
 }
 
