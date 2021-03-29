@@ -16,11 +16,10 @@ public class GooglePlace {
     private String address;
     @NonNull
     private List<String> types;
-
-    //coords[0] = latitude, coords[1] = longitude
     @NonNull
-    private List<Float> coords;
-
+    private Float latitude;
+    @NonNull
+    private Float longitude;
     //popularTimes<dayOfWeek><data<Integer>>
     //data is an array of 24 integers corresponding to hours of the day. Each integer ranges from 0-100
     @NonNull
@@ -36,17 +35,35 @@ public class GooglePlace {
     private String phoneNum;
     private List<Integer> timeSpent;
 
-    public GooglePlace(@NonNull String id,@NonNull String name,@NonNull String address,@NonNull List<String> types,@NonNull List<Float> coords,@NonNull Map<String,List<Integer>> popularTimes){
+    public GooglePlace(@NonNull String id,@NonNull String name,@NonNull String address,@NonNull List<String> types,@NonNull Float latitude, @NonNull Float longitude,@NonNull Map<String,List<Integer>> popularTimes){
         this.id = id;
         this.name = name;
         this.address = address;
         this.types = types;
-        this.coords = coords;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.popularTimes = popularTimes;
     }
     public GooglePlace(){
     }
 
+    @NonNull
+    public Float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(@NonNull Float latitude) {
+        this.latitude = latitude;
+    }
+
+    @NonNull
+    public Float getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(@NonNull Float longitude) {
+        this.longitude = longitude;
+    }
 
     @NonNull
     public String getId() {
@@ -82,15 +99,6 @@ public class GooglePlace {
 
     public void setTypes(@NonNull List<String> types) {
         this.types = types;
-    }
-
-    @NonNull
-    public List<Float> getCoords() {
-        return coords;
-    }
-
-    public void setCoords(@NonNull List<Float> coords) {
-        this.coords = coords;
     }
 
     @NonNull
