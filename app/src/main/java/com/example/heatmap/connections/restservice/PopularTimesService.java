@@ -3,6 +3,7 @@ package com.example.heatmap.connections.restservice;
 import android.util.Log;
 import java.util.concurrent.TimeUnit;
 
+import data.model.GooglePlace;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -66,9 +67,10 @@ public class PopularTimesService implements PopularTimesApi {
      *  <ul>
      *    <li><strong>place_id</strong> Espera un valor id de google place.</li>
      *  </ul>
+     * @return
      */
     @Override
-    public Call<ResponseBody> get_id(ParametersPT parametersPT) {
+    public Call<GooglePlace> get_id(ParametersPT parametersPT) {
         return populartimesApi.get_id(parametersPT);
     }
 }
