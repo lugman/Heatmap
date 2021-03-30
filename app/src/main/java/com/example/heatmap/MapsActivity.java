@@ -18,12 +18,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -40,6 +42,7 @@ import java.io.IOException;
 
 import static android.content.ContentValues.TAG;
 
+import data.model.PlaceSearch;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,9 +51,11 @@ import retrofit2.Response;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private final String apiKey = "AIzaSyBC5WXRHQ7fKL96InPGDLXPrpztFFYcpLg";
+    //TODO: Change api key
+    private final String apiKey = "your_api_key";
     private ActivityMapsBinding binding;
     private GoogleMap mMap;
+    private Marker lastMarker;
     private PlacesClient placesClient;
 
     @Override
@@ -126,8 +131,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onPlaceSelected(@NotNull Place place) {
                 // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
+                getLatLng(place.getId());
 
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(getLatLng(place.getId())));
             }
 
             @Override
@@ -138,31 +143,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private LatLng getLatLng(String placeId) {
+    private void getLatLng(String placeId) {
         LatLngService latLngService = LatLngService.getInstance();
-        Call<ResponseBody> response  = latLngService.getLatLng(apiKey, placeId);
+        Call<PlaceSearch> response  = latLngService.getLatLng(apiKey, placeId);
 
         try {
-            //TODO: cambiar execute por enqueue
-            Response<ResponseBody> responseHttp = response.execute();
-            Double[] latLng = arrayLatLng(responseHttp.body().string());
-            return new LatLng(latLng[0],latLng[1]);
+            response.enqueue(new Callback<PlaceSearch>() {
+                @Override
+                public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
+                    try {
+                        PlaceSearch placeResponse = response.body();
+
+                        Double[] latLng = arrayLatLng(placeResponse);
+                        LatLng placeLatLng = new LatLng(latLng[0],latLng[1]);
+                        Log.i("LatLng", latLng[0] + " " + latLng[1]);
+
+                        if (lastMarker != null) lastMarker.remove();
+                        lastMarker = mMap.addMarker(new MarkerOptions().position(placeLatLng));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeLatLng));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                @Override
+                public void onFailure(Call<PlaceSearch> call, Throwable t) {
+                    Log.e("HTTP_Call_Error", t.getMessage());
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return null;
     }
 
-    private Double[] arrayLatLng(String response) throws JSONException {
-        JSONObject responseJson = new JSONObject(response);
-        JSONArray arrayJson = responseJson.getJSONArray("results");
-        JSONObject location = arrayJson.getJSONObject(0)
-                .getJSONObject("geometry")
-                .getJSONObject("location");
+    private Double[] arrayLatLng(PlaceSearch response) throws JSONException {
+        PlaceSearch.Location location = response.results.get(0).geometry.location;
 
-        return new Double[]{location.getDouble("lat"),
-                            location.getDouble("lng")};
+        return new Double[]{location.lat, location.lng};
     }
 
     /**
@@ -183,7 +199,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         LatLng etsinf = new LatLng(39.48305714751131, -0.34783486024869137);
-        mMap.addMarker(new MarkerOptions().position(etsinf).title("Etsinf"));
+        lastMarker = mMap.addMarker(new MarkerOptions().position(etsinf).title("Etsinf"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(etsinf));
         mMap.setMinZoomPreference(14.0f);
         mMap.setMaxZoomPreference(20.0f);

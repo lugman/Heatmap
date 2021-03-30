@@ -3,6 +3,7 @@ package com.example.heatmap.connections.restservice;
 import java.util.concurrent.TimeUnit;
 
 import data.model.GooglePlace;
+import data.model.PlaceSearch;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -44,7 +45,7 @@ public class LatLngService implements LatLngApi {
     }
 
     @Override
-    public Call<ResponseBody> getLatLng(String apiKey, String placeId) {
+    public Call<PlaceSearch> getLatLng(String apiKey, String placeId) {
         return latLngApi.getLatLng(apiKey, placeId);
     }
 }
