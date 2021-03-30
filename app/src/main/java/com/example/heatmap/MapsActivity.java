@@ -51,8 +51,9 @@ import retrofit2.Response;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+
     //TODO: Change api key
-    private final String apiKey = "your_api_key";
+    private final String apiKey = BuildConfig.API_KEY;
     private ActivityMapsBinding binding;
     private GoogleMap mMap;
     private Marker lastMarker;
