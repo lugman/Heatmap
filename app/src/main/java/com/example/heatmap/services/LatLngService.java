@@ -1,18 +1,15 @@
-package com.example.heatmap.connections.restservice;
+package com.example.heatmap.services;
+
+import com.example.heatmap.apis.LatLngApi;
 
 import java.util.concurrent.TimeUnit;
 
-import data.model.GooglePlace;
 import data.model.PlaceSearch;
 import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
-import retrofit2.http.Body;
-
-import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 
 public class LatLngService implements LatLngApi {
     private String URL;

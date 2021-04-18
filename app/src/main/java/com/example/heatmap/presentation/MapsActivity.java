@@ -1,17 +1,17 @@
-package com.example.heatmap;
+package com.example.heatmap.presentation;
 
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.example.heatmap.connections.restservice.LatLngService;
-import com.example.heatmap.connections.restservice.ParametersPT;
-import com.example.heatmap.connections.restservice.PopularTimesService;
+import com.example.heatmap.BuildConfig;
+import com.example.heatmap.R;
+import com.example.heatmap.services.LatLngService;
+import com.example.heatmap.connections.ParametersPT;
+import com.example.heatmap.services.PopularTimesService;
 import com.example.heatmap.databinding.ActivityMapsBinding;
+import com.example.heatmap.utils.MapsUtils;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,25 +25,18 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import data.model.GooglePlace;
 
-import java.io.IOException;
-
 import static android.content.ContentValues.TAG;
 
 import data.model.PlaceSearch;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -58,6 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private Marker lastMarker;
     private PlacesClient placesClient;
+    private MapsUtils mapsUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,18 +188,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mapsUtils = new MapsUtils(mMap);
+
+        LatLng etsinf = new LatLng(39.48305714751131, -0.34783486024869137);
+        mapsUtils.setMarker(etsinf, "Etsinf");
+
+        List<GooglePlace> googlePlaces = mapsUtils.createPlaces(15, etsinf);
+
+        mapsUtils.addHeatMap(googlePlaces);
 
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        LatLng etsinf = new LatLng(39.48305714751131, -0.34783486024869137);
-        lastMarker = mMap.addMarker(new MarkerOptions().position(etsinf).title("Etsinf"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(etsinf));
-        mMap.setMinZoomPreference(14.0f);
-        mMap.setMaxZoomPreference(20.0f);
 
-        List<GooglePlace> googlePlaces = new ArrayList<>();
+        /*
         HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
         GooglePlace googlePlace = new GooglePlace();
         googlePlace.setLatitude(39.48305714751131f);
@@ -239,5 +236,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googlePlaces.add(googlePlace);
 
         heatmapDrawer.makeHeatMap(googlePlaces);
+        */
     }
 }

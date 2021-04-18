@@ -1,4 +1,4 @@
-package com.example.heatmap.connections.restservice;
+package com.example.heatmap.apis;
 
 import data.model.PlaceSearch;
 import okhttp3.ResponseBody;
