@@ -12,6 +12,7 @@ import com.example.heatmap.connections.ParametersPT;
 import com.example.heatmap.services.PopularTimesService;
 import com.example.heatmap.databinding.ActivityMapsBinding;
 import com.example.heatmap.utils.MapsUtils;
+import com.example.heatmap.utils.PlacesUtils;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -52,6 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker lastMarker;
     private PlacesClient placesClient;
     private MapsUtils mapsUtils;
+    private PlacesUtils placesUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +61,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
 
-        //initializePlaces(apiKey);
+        initializePlaces(apiKey);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -139,41 +141,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getLatLng(String placeId) {
-        LatLngService latLngService = LatLngService.getInstance();
-        Call<PlaceSearch> response  = latLngService.getLatLng(apiKey, placeId);
+        if (placesUtils == null) placesUtils = new PlacesUtils(apiKey, mMap);
 
-        try {
-            response.enqueue(new Callback<PlaceSearch>() {
-                @Override
-                public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
-                    try {
-                        PlaceSearch placeResponse = response.body();
-
-                        Double[] latLng = arrayLatLng(placeResponse);
-                        LatLng placeLatLng = new LatLng(latLng[0],latLng[1]);
-                        Log.i("LatLng", latLng[0] + " " + latLng[1]);
-
-                        if (lastMarker != null) lastMarker.remove();
-                        lastMarker = mMap.addMarker(new MarkerOptions().position(placeLatLng));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeLatLng));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                @Override
-                public void onFailure(Call<PlaceSearch> call, Throwable t) {
-                    Log.e("HTTP_Call_Error", t.getMessage());
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Double[] arrayLatLng(PlaceSearch response) throws JSONException {
-        PlaceSearch.Location location = response.results.get(0).geometry.location;
-
-        return new Double[]{location.lat, location.lng};
+        placesUtils.getLatLng(placeId);
     }
 
     /**
