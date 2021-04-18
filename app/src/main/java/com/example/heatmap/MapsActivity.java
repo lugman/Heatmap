@@ -65,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
 
-        initializePlaces(apiKey);
+        //initializePlaces(apiKey);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -73,7 +73,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 
+        //ejemploLlamadaApi();
+    }
 
+    private void ejemploLlamadaApi(){
         /*
                     EJEMPLO DE LLAMADA A LA API.
         */
@@ -108,9 +111,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d("Response",t.getLocalizedMessage());
             }
         });
-
-
-
 
     }
 

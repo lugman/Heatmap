@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        buildConfigField("String", "API_KEY", keystoreProperties['API_KEY'])
+        buildConfigField("String", "API_KEY", "\""+keystoreProperties['API_KEY']+"\"")
 
         applicationId "com.example.heatmap"
         minSdkVersion 23
