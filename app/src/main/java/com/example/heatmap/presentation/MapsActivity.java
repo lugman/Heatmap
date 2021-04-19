@@ -1,45 +1,78 @@
-package com.example.heatmap;
+package com.example.heatmap.presentation;
 
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.heatmap.connections.restservice.ParametersPT;
-import com.example.heatmap.connections.restservice.PopularTimesService;
+import com.example.heatmap.BuildConfig;
+import com.example.heatmap.R;
+import com.example.heatmap.services.LatLngService;
+import com.example.heatmap.connections.ParametersPT;
 import com.example.heatmap.services.PopularTimesService;
+import com.example.heatmap.databinding.ActivityMapsBinding;
+import com.example.heatmap.utils.MapsUtils;
+import com.example.heatmap.utils.PlacesUtils;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
-import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+
+import java.util.Arrays;
 import java.util.List;
 
 import data.model.GooglePlace;
 
-import java.io.IOException;
+import static android.content.ContentValues.TAG;
 
-import okhttp3.ResponseBody;
+import data.model.PlaceSearch;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+
+    //TODO: Change api key
+    private final String apiKey = BuildConfig.API_KEY;
+    private ActivityMapsBinding binding;
     private GoogleMap mMap;
+    private Marker lastMarker;
+    private PlacesClient placesClient;
+    private MapsUtils mapsUtils;
+    private PlacesUtils placesUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        binding = ActivityMapsBinding.inflate(getLayoutInflater());
+
+        initializePlaces(apiKey);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(binding.map.getId());
         mapFragment.getMapAsync(this);
 
+
+        //ejemploLlamadaApi();
+    }
+
+    private void ejemploLlamadaApi(){
         /*
                     EJEMPLO DE LLAMADA A LA API.
         */
@@ -75,9 +108,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+    }
 
+    private void initializePlaces(String apiKey) {
+        // Initialize Places client
+        Places.initialize(getApplicationContext(), apiKey);
+        placesClient = Places.createClient(this);
 
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(binding.autocompleteFragment.getId());
 
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NotNull Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
+                getLatLng(place.getId());
+
+            }
+
+            @Override
+            public void onError(@NotNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
+    }
+
+    private void getLatLng(String placeId) {
+        if (placesUtils == null) placesUtils = new PlacesUtils(apiKey, mMap);
+
+        placesUtils.getLatLng(placeId);
     }
 
     /**
@@ -89,24 +155,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mapsUtils = new MapsUtils(mMap);
+
+        LatLng etsinf = new LatLng(39.48305714751131, -0.34783486024869137);
+        mapsUtils.setMarker(etsinf, "Etsinf");
+
+        List<GooglePlace> googlePlaces = mapsUtils.createPlaces(15, etsinf);
+
+        mapsUtils.addHeatMap(googlePlaces);
 
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        LatLng etsinf = new LatLng(39.48305714751131, -0.34783486024869137);
-        mMap.addMarker(new MarkerOptions().position(etsinf).title("Etsinf"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(etsinf));
-        mMap.setMinZoomPreference(14.0f);
-        mMap.setMaxZoomPreference(20.0f);
 
-        List<GooglePlace> googlePlaces = new ArrayList<>();
+        /*
         HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
-
         GooglePlace googlePlace = new GooglePlace();
         googlePlace.setLatitude(39.48305714751131f);
         googlePlace.setLongitude(-0.34783486024869137f);
@@ -139,5 +206,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googlePlaces.add(googlePlace);
 
         heatmapDrawer.makeHeatMap(googlePlaces);
+        */
     }
 }
