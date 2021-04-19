@@ -1,4 +1,4 @@
-package com.example.heatmap.connections.restservice;
+package com.example.heatmap.connections;
 
 public class ParametersPT {
 
@@ -12,8 +12,8 @@ public class ParametersPT {
      String api_key;
      String place_id;
      String [] types;
-     double[] p1;
-     double[] p2;
+     public double[] p1;
+     public double[] p2;
      int n_threads;
      int radius;
      boolean all_places;

@@ -1,4 +1,4 @@
-package com.example.heatmap;
+package com.example.heatmap.utils;
 
 import android.graphics.Color;
 

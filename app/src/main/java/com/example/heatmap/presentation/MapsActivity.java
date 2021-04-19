@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.example.heatmap.connections.restservice.ParametersPT;
 import com.example.heatmap.connections.restservice.PopularTimesService;
+import com.example.heatmap.services.PopularTimesService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,8 +39,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
 
         /*
                     EJEMPLO DE LLAMADA A LA API.
@@ -90,6 +89,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -106,6 +106,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         List<GooglePlace> googlePlaces = new ArrayList<>();
         HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
+
         GooglePlace googlePlace = new GooglePlace();
         googlePlace.setLatitude(39.48305714751131f);
         googlePlace.setLongitude(-0.34783486024869137f);

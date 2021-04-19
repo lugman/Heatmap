@@ -1,7 +1,9 @@
-package com.example.heatmap.connections.restservice;
+package com.example.heatmap.services;
 
 import android.util.Log;
 
+import com.example.heatmap.apis.PopularTimesApi;
+import com.example.heatmap.connections.ParametersPT;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -10,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import data.model.GooglePlace;
 import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
