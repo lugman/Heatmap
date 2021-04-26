@@ -1,7 +1,5 @@
 package com.example.heatmap.presentation;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
@@ -12,6 +10,7 @@ import com.example.heatmap.R;
 import com.example.heatmap.connections.ParametersPT;
 import com.example.heatmap.services.PopularTimesService;
 import com.example.heatmap.databinding.ActivityMapsBinding;
+import com.example.heatmap.utils.HeatmapDrawer;
 import com.example.heatmap.utils.MapsUtils;
 import com.example.heatmap.utils.PlacesUtils;
 import com.google.android.gms.common.api.Status;
@@ -29,18 +28,16 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import data.model.GooglePlace;
 
 import static android.content.ContentValues.TAG;
 
 import data.model.GooglePlaceAccess;
-import data.model.GooglePlaceDao;
 import data.model.GooglePlaceDatabase;
+import data.model.SearchPlaces;
+import data.model.SearchPlacesAccess;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -64,7 +61,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
 
-        testGooglePlaceDb();
 
         initializePlaces(apiKey);
 
@@ -77,56 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //ejemploLlamadaApi();
     }
 
-    private void testGooglePlaceDb() {
-        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(this, GooglePlaceDatabase.getInstance(this));
-        List<GooglePlace> googlePlaces =
-                googlePlaceAccess.getAll();
 
-        if(googlePlaces.size() == 0){
-            //Llenar db con valores de testeo
-            GooglePlace googlePlace = new GooglePlace();
-            googlePlace.setLatitude(39.48305714751131f);
-            googlePlace.setLongitude(-0.34783486024869137f);
-            googlePlace.setCurrentPopularity(15);
-            googlePlace.setId("f");
-            googlePlace.setName("Efe");
-            googlePlaceAccess.add(googlePlace);
-
-            googlePlace = new GooglePlace();
-
-            googlePlace.setLatitude(39.48232417821347f);
-            googlePlace.setLongitude(-0.3487664561099621f);
-            googlePlace.setCurrentPopularity(10);
-            googlePlace.setId("f");
-            googlePlace.setName("Efe");
-            googlePlaceAccess.add(googlePlace);
-
-            googlePlace = new GooglePlace();
-
-            googlePlace.setLatitude(39.48281274006481f);
-            googlePlace.setLongitude(-0.3468889099088923f);
-            googlePlace.setCurrentPopularity(30);
-            googlePlace.setId("f");
-            googlePlace.setName("Efe");
-            googlePlaceAccess.add(googlePlace);
-
-            googlePlace = new GooglePlace();
-
-            googlePlace.setLatitude(39.483831256278556f);
-            googlePlace.setLongitude(-0.3468567234025883f);
-            googlePlace.setCurrentPopularity(20);
-            googlePlace.setId("f");
-            googlePlace.setName("Efe");
-            googlePlaceAccess.add(googlePlace);
-        }
-
-        googlePlaces = googlePlaceAccess.getAll();
-
-        Log.d("test db", googlePlaces.size() + "");
-        for (GooglePlace googlePlace : googlePlaces) {
-            Log.d("test db", googlePlace.getLatitude()+ ", " +googlePlace.getLongitude());
-        }
-    }
 
     private void ejemploLlamadaApi(){
         /*
@@ -202,6 +149,94 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         placesUtils.getLatLng(placeId);
     }
 
+    private void testGooglePlaceDb() {
+        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(this, GooglePlaceDatabase.getInstance(this));
+        SearchPlacesAccess searchPlacesAccess = SearchPlacesAccess.getInstance(this, GooglePlaceDatabase.getInstance(this));
+        /*List<GooglePlace> googlePlaces =
+                googlePlaceAccess.getAll();
+
+        if(googlePlaces.size() == 0){
+            //Llenar db con valores de testeo
+            GooglePlace googlePlace = new GooglePlace();
+            googlePlace.setLatitude(39.48305714751131f);
+            googlePlace.setLongitude(-0.34783486024869137f);
+            googlePlace.setCurrentPopularity(15);
+            googlePlace.setId("f");
+            googlePlace.setName("Efe");
+            googlePlaceAccess.add(googlePlace);
+
+            googlePlace = new GooglePlace();
+
+            googlePlace.setLatitude(39.48232417821347f);
+            googlePlace.setLongitude(-0.3487664561099621f);
+            googlePlace.setCurrentPopularity(10);
+            googlePlace.setId("f");
+            googlePlace.setName("Efe");
+            googlePlaceAccess.add(googlePlace);
+
+            googlePlace = new GooglePlace();
+
+            googlePlace.setLatitude(39.48281274006481f);
+            googlePlace.setLongitude(-0.3468889099088923f);
+            googlePlace.setCurrentPopularity(30);
+            googlePlace.setId("f");
+            googlePlace.setName("Efe");
+            googlePlaceAccess.add(googlePlace);
+
+            googlePlace = new GooglePlace();
+
+            googlePlace.setLatitude(39.483831256278556f);
+            googlePlace.setLongitude(-0.3468567234025883f);
+            googlePlace.setCurrentPopularity(20);
+            googlePlace.setId("f");
+            googlePlace.setName("Efe");
+            googlePlaceAccess.add(googlePlace);
+        }
+
+        googlePlaces = googlePlaceAccess.getAll();
+
+        Log.d("test db", googlePlaces.size() + "");
+        for (GooglePlace googlePlace : googlePlaces) {
+            Log.d("test db", googlePlace.getLatitude()+ ", " +googlePlace.getLongitude());
+        }*/
+
+        List<SearchPlaces.SearchPlacesWithGooglePlaces> searchPlacesWithGooglePlaces = searchPlacesAccess.getAll();
+        if(searchPlacesWithGooglePlaces.size() == 0){
+            MapsUtils mapsUtils = new MapsUtils(mMap);
+            List<GooglePlace> googlePlacesList = mapsUtils.createPlaces(10,new LatLng(39.48305714751131f,-0.34783486024869137f));
+            SearchPlaces searchPlaces = new SearchPlaces();
+            long searchPlacesId = searchPlacesAccess.add(searchPlaces);
+            for(int i = 0; i< googlePlacesList.size(); i++) {
+                GooglePlace googlePlace = googlePlacesList.get(i);
+                googlePlace.setSearchPlacesId(searchPlacesId);
+                googlePlace.setId("f");
+                googlePlace.setName("Efe");
+                googlePlaceAccess.add(googlePlace);
+            }
+
+        }
+        else{
+            HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
+            heatmapDrawer.makeHeatMap(searchPlacesWithGooglePlaces.get(0).googlePlaces);
+        }
+
+        searchPlacesWithGooglePlaces = searchPlacesAccess.getAll();
+        Log.d("test db searchPlaces", searchPlacesWithGooglePlaces.size() + "");
+        for (SearchPlaces.SearchPlacesWithGooglePlaces searchPlacesWithGooglePlaces1 : searchPlacesWithGooglePlaces) {
+            Log.d("SearchPlaces test: ", searchPlacesWithGooglePlaces1.googlePlaces.size()+ "");
+            for(GooglePlace googlePlace : searchPlacesWithGooglePlaces1.googlePlaces){
+                Log.d("testgpinsp", googlePlace.getLatitude()+ ", " +googlePlace.getLongitude());
+            }
+        }
+
+    }
+    private void clearDb(){
+        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(this, GooglePlaceDatabase.getInstance(this));
+        SearchPlacesAccess searchPlacesAccess = SearchPlacesAccess.getInstance(this, GooglePlaceDatabase.getInstance(this));
+        googlePlaceAccess.clearTable();
+        searchPlacesAccess.clearTable();
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -221,7 +256,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         List<GooglePlace> googlePlaces = mapsUtils.createPlaces(15, etsinf);
 
-        mapsUtils.addHeatMap(googlePlaces);
+        //mapsUtils.addHeatMap(googlePlaces);
+
+        testGooglePlaceDb();
+        //clearDb();
 
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);

@@ -37,6 +37,11 @@ public class GooglePlace {
         this.placeId = placeId;
     }
 
+    private long searchPlacesId;
+
+    public long getSearchPlacesId() {return searchPlacesId;}
+    public void setSearchPlacesId(long searchPlacesId){ this.searchPlacesId = searchPlacesId; }
+
     @NonNull @ColumnInfo(name="idString")
     private String id;
     @NonNull @ColumnInfo(name = "place_name")
@@ -45,6 +50,8 @@ public class GooglePlace {
     private String address;
     @NonNull @Ignore
     private List<String> types;
+
+
 
     //popularTimes<dayOfWeek><data<Integer>>
     //data is an array of 24 integers corresponding to hours of the day. Each integer ranges from 0-100
