@@ -214,7 +214,7 @@ public class GooglePlace {
     }
 
 
-    class ItemPopularTimes{
+    public class ItemPopularTimes{
 
         String name;
         int data[];

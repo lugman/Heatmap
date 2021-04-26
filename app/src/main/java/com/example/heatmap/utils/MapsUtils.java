@@ -1,10 +1,20 @@
 package com.example.heatmap.utils;
 
+import android.app.AlertDialog;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.example.heatmap.R;
+import com.example.heatmap.connections.ParametersPT;
+import com.example.heatmap.services.PopularTimesService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,22 +22,29 @@ import java.util.List;
 import javax.inject.Singleton;
 
 import data.model.GooglePlace;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @Singleton
 public class MapsUtils {
     private final GoogleMap map;
     private HeatmapDrawer heatmapDrawer;
+    private MapsUtils mapsUtils;
+
 
     /**
      * Create a singleton instance for MapUtils
+     *
      * @param map the map where the utils will plot the data
      */
-    public MapsUtils (GoogleMap map) {
+    public MapsUtils(GoogleMap map) {
         this.map = map;
     }
 
     /**
      * Sets a marker in the map with the given LatLng and a empty title
+     *
      * @param lat the latitude coordinate
      * @param lng the longitude coordinate
      * @return the created marker
@@ -38,6 +55,7 @@ public class MapsUtils {
 
     /**
      * Sets a marker in the map with the given LatLng and a empty title
+     *
      * @param latLng coordinates of the marker
      * @return the created marker
      */
@@ -47,8 +65,9 @@ public class MapsUtils {
 
     /**
      * Sets a marker in the map with the given latitude, longitude coordinates and the title
-     * @param lat the latitude coordinate
-     * @param lng the longitude coordinate
+     *
+     * @param lat   the latitude coordinate
+     * @param lng   the longitude coordinate
      * @param title title of the marker
      * @return the created marker
      */
@@ -58,19 +77,26 @@ public class MapsUtils {
 
     /**
      * Sets a marker in the map with the given LatLng and the title
+     *
      * @param latLng coordinates of the marker
-     * @param title title of the marker
+     * @param title  title of the marker
      * @return the created marker
      */
     public Marker setMarker(LatLng latLng, String title) {
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         map.setMinZoomPreference(14.0f);
         map.setMaxZoomPreference(20.0f);
+
         return map.addMarker(new MarkerOptions().position(latLng).title(title));
     }
 
+
+
+
+
     /**
      * Plot a heatmap with the given places
+     *
      * @param googlePlaceList list of places with the data to plot the heatmap
      */
     public void addHeatMap(List<GooglePlace> googlePlaceList) {
@@ -89,7 +115,8 @@ public class MapsUtils {
     /**
      * Create a list of places with a random population from 0 to 100 and
      * a LatLng with a maximum of ±.0015 deviation from the given LatLng
-     * @param number number of places to create
+     *
+     * @param number    number of places to create
      * @param aproxZone aprox zone where they will be created
      * @return populated list of places
      */
@@ -100,8 +127,9 @@ public class MapsUtils {
     /**
      * Create a list of places with a random population from 0 to 100
      * and LatLng with the given ranges
-     * @param number number of places to create
-     * @param aproxZone aprox zone where they will be created
+     *
+     * @param number       number of places to create
+     * @param aproxZone    aprox zone where they will be created
      * @param maxDeviation max deviation for LatLng
      * @return populated list of places
      */
@@ -112,8 +140,9 @@ public class MapsUtils {
     /**
      * Create a list of places with a random population from the given ranges
      * and a LatLng maximum deviation of ±.0015
-     * @param number number of places to create
-     * @param aproxZone aprox zone where they will be created
+     *
+     * @param number        number of places to create
+     * @param aproxZone     aprox zone where they will be created
      * @param maxPopulation max population for the place
      * @return populated list of places
      */
@@ -123,9 +152,10 @@ public class MapsUtils {
 
     /**
      * Create a list of places with a random population and LatLng with the given ranges
-     * @param number number of places to create
-     * @param aproxZone aprox zone where they will be created
-     * @param maxDeviation max deviation for LatLng
+     *
+     * @param number        number of places to create
+     * @param aproxZone     aprox zone where they will be created
+     * @param maxDeviation  max deviation for LatLng
      * @param maxPopulation max population for the place
      * @return populated list of places
      */
