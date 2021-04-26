@@ -1,38 +1,60 @@
 package data.model;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+import androidx.room.Relation;
+import androidx.room.TypeConverter;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
+@Entity(tableName = "place_table")
 public class GooglePlace {
 
-    @NonNull
+    @PrimaryKey(autoGenerate = true)
+    private long placeId;
+
+    public long getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(long placeId) {
+        this.placeId = placeId;
+    }
+
+    @NonNull @ColumnInfo(name="idString")
     private String id;
-    @NonNull
+    @NonNull @ColumnInfo(name = "place_name")
     private String name;
-    @NonNull
+    @NonNull @Ignore
     private String address;
-    @NonNull
+    @NonNull @Ignore
     private List<String> types;
 
     //popularTimes<dayOfWeek><data<Integer>>
     //data is an array of 24 integers corresponding to hours of the day. Each integer ranges from 0-100
-    @NonNull
+    @NonNull @ColumnInfo(name ="place_populartimes")
     private List<ItemPopularTimes> populartimes;
-    @NonNull
-    private Coordinates coordinates;
-    //HashMap<dayOfWeek><data<Integer>>  -  same as popularTimes but with waiting time
-    private List<ItemPopularTimes> time_wait;
-    private double rating;
-    private int currentPopularity;
-    //Commented because no clear example on popularity data from web.
-    // private int popularity;
-    private int rating_n;
-    private String international_phone_number;
-    private List<Integer> time_spent;
 
-    public GooglePlace(@NonNull String id, @NonNull String name, @NonNull String address, @NonNull List<String> types, @NonNull List<ItemPopularTimes> populartimes, @NonNull Coordinates coordinates) {
+    @ColumnInfo(name = "place_currentPopularity")
+    private int currentPopularity;
+
+    public GooglePlace(@NonNull String id,@NonNull String name,@NonNull String address,@NonNull List<String> types,@NonNull List<ItemPopularTimes> populartimes,@NonNull Coordinates coordinates) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -40,9 +62,12 @@ public class GooglePlace {
         this.populartimes = populartimes;
         this.coordinates = coordinates;
     }
-    public GooglePlace() {
-        this.coordinates = new Coordinates();
+
+    public GooglePlace(){
+        this.coordinates= new Coordinates();
+        this.populartimes = new ArrayList<ItemPopularTimes>();
     }
+
 
     @NonNull
     public Coordinates getCoordinates() {
@@ -53,22 +78,39 @@ public class GooglePlace {
         this.coordinates = coordinates;
     }
 
+    @NonNull @ColumnInfo(name = "place_coordinates")
+    private Coordinates coordinates;
+
+    //HashMap<dayOfWeek><data<Integer>>  -  same as popularTimes but with waiting time
+    @Ignore
+    private List<ItemPopularTimes> time_wait;
+    @Ignore
+    private double rating;
+    //Commented because no clear example on popularity data from web.
+   // private int popularity;
+    @Ignore
+    private int rating_n;
+    @Ignore
+    private String international_phone_number;
+    @Ignore
+    private List<Integer> time_spent;
+
+
+    public void setLatitude(float latitude){
+        coordinates.lat=latitude;
+    }
+    public void setLongitude(float longitude){
+        coordinates.lng=longitude;
+    }
+
     @NonNull
     public Float getLatitude() {
         return coordinates.lat;
     }
 
-    public void setLatitude(float latitude) {
-        coordinates.lat = latitude;
-    }
-
     @NonNull
     public Float getLongitude() {
         return coordinates.lng;
-    }
-
-    public void setLongitude(float longitude) {
-        coordinates.lng = longitude;
     }
 
     @NonNull
@@ -165,9 +207,11 @@ public class GooglePlace {
     }
 
 
-    public class ItemPopularTimes {
+    class ItemPopularTimes{
+
         String name;
         int data[];
+
 
         public String getName() {
             return name;
@@ -193,8 +237,11 @@ public class GooglePlace {
                     '}';
         }
     }
+    class Coordinates{
+        private long placeOwnerId;
+        public long getPlaceOwnerId(){return placeOwnerId;}
+        public void setPlaceOwnerId(long placeOwnerId){this.placeOwnerId = placeOwnerId;}
 
-    class Coordinates {
         float lng;
         float lat;
 
@@ -215,6 +262,31 @@ public class GooglePlace {
         }
 
     }
+    /*
+    public class GooglePlaceWithItemPopularTimes {
+        @Embedded public GooglePlace googlePlace;
+        @Relation(
+                parentColumn = "placeId",
+                entityColumn = "placeOwnerId"
+        )
+        public List<ItemPopularTimes> popularTimes;
+    }
+    */
+    /*
+        public class GooglePlaceAndCoordinates {
+            @Embedded public GooglePlace googlePlace;
+            @Relation(
+                    parentColumn = "placeId",
+                    entityColumn = "placeOwnerId"
+            )
+            public List<ItemPopularTimes> popularTimes;
+            @Relation(
+                    parentColumn = "placeId",
+                    entityColumn = "placeOwnerId"
+            )
+            public Coordinates coordinates;
+        }
+    */
+
+
 }
-
-
