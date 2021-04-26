@@ -42,6 +42,8 @@ import data.model.GooglePlace;
 
 import static android.content.ContentValues.TAG;
 
+import data.model.GooglePlaceAccess;
+import data.model.GooglePlaceDatabase;
 import data.model.PlaceSearch;
 import retrofit2.Call;
 import retrofit2.Callback;

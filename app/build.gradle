@@ -59,6 +59,4 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:2.2.2'
     implementation 'androidx.room:room-runtime:2.2.6'
     annotationProcessor 'androidx.room:room-compiler:2.2.6'
-
-
 }
