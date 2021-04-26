@@ -3,11 +3,9 @@ package com.example.heatmap.utils;
 import android.util.Log;
 
 import com.example.heatmap.services.LatLngService;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 
@@ -22,18 +20,22 @@ public class PlacesUtils {
     private Marker lastMarker;
     private MapsUtils mapsUtils;
 
-    public PlacesUtils (String apiKey, GoogleMap map) {
+    public PlacesUtils(String apiKey, GoogleMap map) {
         this.apiKey = apiKey;
         this.map = map;
     }
 
-    public void removeLastMarker() { lastMarker.remove(); }
+    public void removeLastMarker() {
+        lastMarker.remove();
+    }
 
-    public void getLatLng (String placeId) { getLatLng(placeId, "");}
+    public void getLatLng(String placeId) {
+        getLatLng(placeId, "");
+    }
 
-    public void getLatLng (String placeId, String name) {
+    public void getLatLng(String placeId, String name) {
         LatLngService latLngService = LatLngService.getInstance();
-        Call<PlaceSearch> response  = latLngService.getLatLng(apiKey, placeId);
+        Call<PlaceSearch> response = latLngService.getLatLng(apiKey, placeId);
         mapsUtils = new MapsUtils(map);
 
         try {
@@ -44,15 +46,21 @@ public class PlacesUtils {
                         PlaceSearch placeResponse = response.body();
 
                         Double[] latLng = arrayLatLng(placeResponse);
-                        LatLng placeLatLng = new LatLng(latLng[0],latLng[1]);
+                        LatLng placeLatLng = new LatLng(latLng[0], latLng[1]);
                         Log.i("LatLng", latLng[0] + " " + latLng[1]);
 
                         if (lastMarker != null) removeLastMarker();
-                        lastMarker = mapsUtils.setMarker(placeLatLng, name);
+                          lastMarker = mapsUtils.setMarker(placeLatLng, name);
+
+                        // Buscamos en populartimes su actividad
+                        PaintSearch paintSearch = new PaintSearch(map);
+                        paintSearch.drawHeat(placeId,placeLatLng);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
+
                 @Override
                 public void onFailure(Call<PlaceSearch> call, Throwable t) {
                     Log.e("HTTP_Call_Error", t.getMessage());

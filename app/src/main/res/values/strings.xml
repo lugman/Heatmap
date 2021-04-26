@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">heatmap</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps">Map</string>ç
+
+    <string name="titleNotFound">No se ha encontrado información</string>
+    <string name="descNotFound">No se ha podido encontrar información sobre el lugar indicado\n¿Desea obtener una aproximación con los lugares circundantes?</string>
+    <string name="infoNotFound">¡Esta busqueda puede tardar algo de tiempo!</string>
+
+    <string name="Continue">Continuar</string>
+    <string name="Cancel">Cancelar</string>
+
+
 </resources>

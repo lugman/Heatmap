@@ -1,26 +1,24 @@
 package com.example.heatmap.presentation;
 
-import androidx.fragment.app.FragmentActivity;
-
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.fragment.app.FragmentActivity;
+
 import com.example.heatmap.BuildConfig;
 import com.example.heatmap.R;
-import com.example.heatmap.services.LatLngService;
 import com.example.heatmap.connections.ParametersPT;
-import com.example.heatmap.services.PopularTimesService;
 import com.example.heatmap.databinding.ActivityMapsBinding;
+import com.example.heatmap.services.PopularTimesService;
 import com.example.heatmap.utils.MapsUtils;
+import com.example.heatmap.utils.PaintSearch;
 import com.example.heatmap.utils.PlacesUtils;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -28,19 +26,16 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 
 import java.util.Arrays;
 import java.util.List;
 
 import data.model.GooglePlace;
-
-import static android.content.ContentValues.TAG;
-
-import data.model.PlaceSearch;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.content.ContentValues.TAG;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -61,6 +56,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
 
+        PaintSearch.setContext(this);
+
+
         initializePlaces(apiKey);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -69,18 +67,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 
-        //ejemploLlamadaApi();
+        ejemploLlamadaApi();
     }
 
-    private void ejemploLlamadaApi(){
+    private void ejemploLlamadaApi() {
         /*
                     EJEMPLO DE LLAMADA A LA API.
         */
 
-        PopularTimesService populartimesService =  PopularTimesService.getInstance();
+        PopularTimesService populartimesService = PopularTimesService.getInstance();
 
-        Call<List<GooglePlace>> response2 = populartimesService.get(new ParametersPT(new String[]{"bar"},new double[]{48.132986, 11.566126},new double[]{48.142199, 11.580047,},60,90));
-        Call<GooglePlace> response  = populartimesService.get_id(new ParametersPT("ChIJSYuuSx9awokRyrrOFTGg0GY"));
+        Call<List<GooglePlace>> response2 = populartimesService.get(new ParametersPT(new String[]{"bar"}, new double[]{48.132986, 11.566126}, new double[]{48.142199, 11.580047,}, 60, 90));
+        Call<GooglePlace> response = populartimesService.get_id(new ParametersPT("ChIJSYuuSx9awokRyrrOFTGg0GY"));
 
         response2.enqueue(new Callback<List<GooglePlace>>() {
             @Override
@@ -99,12 +97,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         response.enqueue(new Callback<GooglePlace>() {
             @Override
             public void onResponse(Call<GooglePlace> call, Response<GooglePlace> response) {
-                Log.d("Response", String.valueOf(response.body().getTimeWait()));
+                Log.d("Response get", String.valueOf(response.body().getPopulartimes()));
             }
 
             @Override
             public void onFailure(Call<GooglePlace> call, Throwable t) {
-                Log.d("Response",t.getLocalizedMessage());
+                Log.d("Response", t.getLocalizedMessage());
             }
         });
 

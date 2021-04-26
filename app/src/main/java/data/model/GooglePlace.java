@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class GooglePlace {
 
@@ -21,6 +20,29 @@ public class GooglePlace {
     //data is an array of 24 integers corresponding to hours of the day. Each integer ranges from 0-100
     @NonNull
     private List<ItemPopularTimes> populartimes;
+    @NonNull
+    private Coordinates coordinates;
+    //HashMap<dayOfWeek><data<Integer>>  -  same as popularTimes but with waiting time
+    private List<ItemPopularTimes> time_wait;
+    private double rating;
+    private int currentPopularity;
+    //Commented because no clear example on popularity data from web.
+    // private int popularity;
+    private int rating_n;
+    private String international_phone_number;
+    private List<Integer> time_spent;
+
+    public GooglePlace(@NonNull String id, @NonNull String name, @NonNull String address, @NonNull List<String> types, @NonNull List<ItemPopularTimes> populartimes, @NonNull Coordinates coordinates) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.types = types;
+        this.populartimes = populartimes;
+        this.coordinates = coordinates;
+    }
+    public GooglePlace() {
+        this.coordinates = new Coordinates();
+    }
 
     @NonNull
     public Coordinates getCoordinates() {
@@ -32,46 +54,21 @@ public class GooglePlace {
     }
 
     @NonNull
-    private Coordinates coordinates;
-
-    //HashMap<dayOfWeek><data<Integer>>  -  same as popularTimes but with waiting time
-    private List<ItemPopularTimes> time_wait;
-    private double rating;
-    private int currentPopularity;
-    //Commented because no clear example on popularity data from web.
-   // private int popularity;
-    private int rating_n;
-
-    private String international_phone_number;
-    private List<Integer> time_spent;
-
-    public GooglePlace(@NonNull String id,@NonNull String name,@NonNull String address,@NonNull List<String> types,@NonNull List<ItemPopularTimes> populartimes,@NonNull Coordinates coordinates){
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.types = types;
-        this.populartimes = populartimes;
-        this.coordinates= coordinates;
-    }
-    public GooglePlace(){
-        this.coordinates= new Coordinates();
-    }
-
-    public void setLatitude(float latitude){
-        coordinates.lat=latitude;
-    }
-    public void setLongitude(float longitude){
-        coordinates.lng=longitude;
-    }
-
-    @NonNull
     public Float getLatitude() {
         return coordinates.lat;
+    }
+
+    public void setLatitude(float latitude) {
+        coordinates.lat = latitude;
     }
 
     @NonNull
     public Float getLongitude() {
         return coordinates.lng;
+    }
+
+    public void setLongitude(float longitude) {
+        coordinates.lng = longitude;
     }
 
     @NonNull
@@ -168,7 +165,7 @@ public class GooglePlace {
     }
 
 
-    class ItemPopularTimes{
+    public class ItemPopularTimes {
         String name;
         int data[];
 
@@ -197,7 +194,7 @@ public class GooglePlace {
         }
     }
 
-    class Coordinates{
+    class Coordinates {
         float lng;
         float lat;
 
