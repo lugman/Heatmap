@@ -12,9 +12,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class LatLngService implements LatLngApi {
+    private static LatLngService instance;
     private String URL;
     private LatLngApi latLngApi;
-    private static LatLngService instance;
 
     private LatLngService() {
         URL = "https://maps.googleapis.com/maps/api/geocode/";
@@ -34,8 +34,8 @@ public class LatLngService implements LatLngApi {
         latLngApi = retrofit.create(LatLngApi.class);
     }
 
-    public static LatLngService getInstance(){
-        if (instance == null){
+    public static LatLngService getInstance() {
+        if (instance == null) {
             instance = new LatLngService();
         }
         return instance;

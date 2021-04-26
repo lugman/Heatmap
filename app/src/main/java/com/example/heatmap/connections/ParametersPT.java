@@ -2,22 +2,21 @@ package com.example.heatmap.connections;
 
 public class ParametersPT {
 
-     final String API_KEY ="AIzaSyAcaJCgXXdGh-NWGv-VlvdG9Ei5UreYkKs";
-     final String METHOD_GET = "get";
-     final String METHOD_GET_ID= "get_id";
-     final int DEFAULT_RADIUS = 180;
-     final int DEFAULT_THREADS = 20;
-     final boolean DEFAULT_ALL_PLACES = false;
-
-     String api_key;
-     String place_id;
-     String [] types;
-     public double[] p1;
-     public double[] p2;
-     int n_threads;
-     int radius;
-     boolean all_places;
-     String method;
+    final String API_KEY = "AIzaSyCelNyXZrtQTVmxtmOZxnRcyskjZamkVG8";
+    final String METHOD_GET = "get";
+    final String METHOD_GET_ID = "get_id";
+    final int DEFAULT_RADIUS = 180;
+    final int DEFAULT_THREADS = 20;
+    final boolean DEFAULT_ALL_PLACES = false;
+    public double[] p1;
+    public double[] p2;
+    String api_key;
+    String place_id;
+    String[] types;
+    int n_threads;
+    int radius;
+    boolean all_places;
+    String method;
 
     public ParametersPT(String place_id) {
         this.api_key = API_KEY;
