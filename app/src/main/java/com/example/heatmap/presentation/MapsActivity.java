@@ -1,9 +1,14 @@
 package com.example.heatmap.presentation;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.example.heatmap.BuildConfig;
 import com.example.heatmap.R;
@@ -195,22 +200,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         List<SearchPlaces.SearchPlacesWithGooglePlaces> searchPlacesWithGooglePlaces = searchPlacesAccess.getAll();
         if (searchPlacesWithGooglePlaces.size() == 0) {
-            MapsUtils mapsUtils = new MapsUtils(mMap);
-            List<GooglePlace> googlePlacesList = mapsUtils.createPlaces(10,
-                    new LatLng(39.48305714751131f, -0.34783486024869137f));
-            SearchPlaces searchPlaces = new SearchPlaces();
-            long searchPlacesId = searchPlacesAccess.add(searchPlaces);
-            for (int i = 0; i < googlePlacesList.size(); i++) {
-                GooglePlace googlePlace = googlePlacesList.get(i);
-                googlePlace.setSearchPlacesId(searchPlacesId);
-                googlePlace.setId("f");
-                googlePlace.setName("Efe");
-                googlePlaceAccess.add(googlePlace);
+            if(mapsUtils == null) mapsUtils = new MapsUtils(mMap);
+            for(int j = 0; j < 10; j++){
+                List<GooglePlace> googlePlacesList = mapsUtils.createPlaces(10,
+                        new LatLng(39.48305714751131f, -0.34783486024869137f));
+                SearchPlaces searchPlaces = new SearchPlaces();
+                searchPlaces.setSearchedLocation("Search " + j);
+                long searchPlacesId = searchPlacesAccess.add(searchPlaces);
+                for (int i = 0; i < googlePlacesList.size(); i++) {
+                    GooglePlace googlePlace = googlePlacesList.get(i);
+                    googlePlace.setSearchPlacesId(searchPlacesId);
+                    googlePlace.setId("f");
+                    googlePlace.setName("Efe");
+                    googlePlaceAccess.add(googlePlace);
+                }
             }
 
+
         } else {
-            HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
-            heatmapDrawer.makeHeatMap(searchPlacesWithGooglePlaces.get(0).googlePlaces);
+            if(mapsUtils == null) mapsUtils = new MapsUtils(mMap);
+            mapsUtils.clearHeatMap();
+            mapsUtils.addHeatMap(searchPlacesWithGooglePlaces.get(0).googlePlaces);
         }
 
         searchPlacesWithGooglePlaces = searchPlacesAccess.getAll();
@@ -233,6 +243,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         searchPlacesAccess.clearTable();
     }
 
+    public void openSavedMenu(View view) {
+        SelectSavedSearchDialogFragment dialog = new SelectSavedSearchDialogFragment(mMap, mapsUtils);
+        dialog.show(getSupportFragmentManager(), "selectSaved");
+    }
+
+    public static class SelectSavedSearchDialogFragment extends DialogFragment {
+        private List<SearchPlaces.SearchPlacesWithGooglePlaces> searchPlaces;
+        private GoogleMap mMap;
+        private MapsUtils mapsUtils;
+
+        public SelectSavedSearchDialogFragment(GoogleMap map, MapsUtils mapsUtils){
+            mMap = map;
+            this.mapsUtils = mapsUtils;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            SearchPlacesAccess searchPlacesAccess = SearchPlacesAccess.getInstance(getContext(),
+                    GooglePlaceDatabase.getInstance(getContext()));
+            searchPlaces = searchPlacesAccess.getAll();
+            // Use the Builder class for convenient dialog construction
+            CharSequence[] items = new CharSequence[searchPlaces.size()];
+            for(int i = 0; i < searchPlaces.size(); i++){
+                items[i] = searchPlaces.get(i).searchPlaces.getSearchedLocation();
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.dialogSelectTitle)
+                    /*.setPositiveButton(R.string.Okay, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    })
+                    .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    })*/
+            .setItems(items, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if(mapsUtils == null) mapsUtils = new MapsUtils(mMap);
+                    mapsUtils.clearHeatMap();
+                    mapsUtils.addHeatMap(searchPlaces.get(which).googlePlaces);
+                }
+            });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+    }
+
     /**
      * Manipulates the map once available. This callback is triggered when the map
      * is ready to be used. This is where we can add markers or lines, add listeners
@@ -252,9 +311,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         List<GooglePlace> googlePlaces = mapsUtils.createPlaces(15, etsinf);
 
-        // mapsUtils.addHeatMap(googlePlaces);
+        mapsUtils.addHeatMap(googlePlaces);
 
-        testGooglePlaceDb();
+        //testGooglePlaceDb();
         // clearDb();
 
         // Add a marker in Sydney and move the camera

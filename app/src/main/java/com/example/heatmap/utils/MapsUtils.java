@@ -105,6 +105,10 @@ public class MapsUtils {
         heatmapDrawer.makeHeatMap(googlePlaceList);
     }
 
+    public void clearHeatMap(){
+        heatmapDrawer.clearHeatMap();
+    }
+
     /**
      * Clears all the plotted data in the map
      */

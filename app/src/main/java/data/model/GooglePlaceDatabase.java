@@ -7,7 +7,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
-@Database(entities = {GooglePlace.class, SearchPlaces.class}, version = 5, exportSchema = false)
+@Database(entities = {GooglePlace.class, SearchPlaces.class}, version = 6, exportSchema = false)
 @TypeConverters(GooglePlaceConverters.class)
 public abstract class GooglePlaceDatabase extends RoomDatabase {
     private  static  GooglePlaceDatabase googlePlaceDatabase;

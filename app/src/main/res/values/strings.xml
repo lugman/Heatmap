@@ -8,6 +8,8 @@
 
     <string name="Continue">Continuar</string>
     <string name="Cancel">Cancelar</string>
+    <string name="Okay">Aceptar</string>
+    <string name="dialogSelectTitle">Cargar búsqueda anterior</string>
 
 
 </resources>

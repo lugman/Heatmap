@@ -18,6 +18,7 @@ import data.model.GooglePlace;
 
 public class HeatmapDrawer {
     private GoogleMap mMap;
+    private TileOverlay mOverlay;
 
     public HeatmapDrawer(GoogleMap mMap) {
         this.mMap = mMap;
@@ -32,7 +33,11 @@ public class HeatmapDrawer {
                 .build();
 
         // Add a tile overlay to the map, using the heat map tile provider.
-        TileOverlay overlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider((TileProvider) provider));
+        mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider((TileProvider) provider));
+    }
+
+    public void clearHeatMap(){
+        mOverlay.remove();
     }
 
     public void makeHeatMap(List<GooglePlace> googlePlaces) {

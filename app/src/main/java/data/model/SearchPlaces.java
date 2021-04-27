@@ -17,6 +17,17 @@ public class SearchPlaces {
     public long getId(){return id;}
     public void setId(long id){this.id = id;}
 
+    @ColumnInfo(name = "search_location")
+    private String searchedLocation;
+
+    public String getSearchedLocation() {
+        return searchedLocation;
+    }
+
+    public void setSearchedLocation(String searchedLocation) {
+        this.searchedLocation = searchedLocation;
+    }
+
     public SearchPlaces(){
     }
 

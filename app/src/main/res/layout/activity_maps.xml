@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".presentation.MapsActivity">
 
+    <ImageButton
+        android:id="@+id/bSavedSearches"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/Transparent"
+        android:contentDescription="SavedSearches"
+        android:onClick="openSavedMenu"
+        android:src="@mipmap/bookmark_foreground"
+        android:translationZ="90dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/first_row" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/autocomplete_fragment"
         android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
@@ -19,7 +31,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="60dp"
-        app:layout_constraintTop_toBottomOf="@id/autocomplete_fragment" />
+        app:layout_constraintTop_toBottomOf="@id/autocomplete_fragment">
+
+    </androidx.fragment.app.FragmentContainerView>
 
     <RelativeLayout
         android:id="@+id/first_row"
