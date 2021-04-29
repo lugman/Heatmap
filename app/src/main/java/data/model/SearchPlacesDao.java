@@ -10,24 +10,21 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import data.model.GooglePlace;
-
 @Dao
-public interface GooglePlaceDao {
+public interface SearchPlacesDao {
     @Transaction
-    @Query("SELECT * FROM place_table")
-    List<GooglePlace> googlePlaces();
+    @Query("SELECT * FROM searchplaces_table")
+    List<SearchPlaces.SearchPlacesWithGooglePlaces> getPlacesFromSearch();
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void addGooglePlace(GooglePlace googlePlace);
+    long addSearchPlaces(SearchPlaces searchPlaces);
 
     @Update
-    void updateGooglePlace(GooglePlace googlePlace);
+    void updateSearchPlaces(SearchPlaces searchPlaces);
 
     @Delete
-    void deleteGooglePlace(GooglePlace googlePlace);
+    void deleteSearchPlaces(SearchPlaces searchPlaces);
 
-    @Query("DELETE FROM place_table")
+    @Query("DELETE FROM searchplaces_table")
     void clearTable();
-
 }

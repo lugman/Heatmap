@@ -32,6 +32,8 @@ public class HeatmapDrawer {
     private GoogleMap mMap;
     private Circle circle;
     private static HeatmapDrawer heatmapDrawer;
+    private TileOverlay mOverlay;
+
 
     public HeatmapDrawer(GoogleMap mMap) {
         this.mMap = mMap;
@@ -53,7 +55,11 @@ public class HeatmapDrawer {
                 .build();
 
         // Add a tile overlay to the map, using the heat map tile provider.
-        TileOverlay overlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider((TileProvider) provider));
+        mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider((TileProvider) provider));
+    }
+
+    public void clearHeatMap(){
+        mOverlay.remove();
     }
 
     public void makeHeatMap(List<GooglePlace> googlePlaces) {
@@ -105,6 +111,7 @@ public class HeatmapDrawer {
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.amu_bubble_shadow)));*/
 
     }
+
     public void drawCircle(GooglePlace googlePlace) {
         LatLng latLng = new LatLng(googlePlace.getLatitude(), googlePlace.getLongitude());
         int popularity = googlePlace.getCurrentPopularity();

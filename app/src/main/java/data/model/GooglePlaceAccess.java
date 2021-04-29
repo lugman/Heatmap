@@ -24,4 +24,6 @@ public class GooglePlaceAccess {
     public void add(GooglePlace googlePlace){
         dao.addGooglePlace(googlePlace);
     }
+
+    public void clearTable(){ dao.clearTable(); }
 }

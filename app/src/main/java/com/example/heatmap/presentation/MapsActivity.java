@@ -234,23 +234,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mapsUtils = new MapsUtils(mMap);
 
-        LatLng etsinf = new LatLng(39.48305714751132, -0.34783486024869137);
-        Marker marker = mapsUtils.setMarker(etsinf, "Etsinf");
-
-
-        HeatmapDrawer heatmapDrawer = HeatmapDrawer.getInstance(mMap);
-        heatmapDrawer.drawCircle(etsinf,70);
+        LatLng etsinf = new LatLng(39.48305714751131, -0.34783486024869137);
+        mapsUtils.setMarker(etsinf, "Etsinf");
 
         List<GooglePlace> googlePlaces = mapsUtils.createPlaces(15, etsinf);
 
-        //mapsUtils.addHeatMap(googlePlaces);
+        mapsUtils.addHeatMap(googlePlaces);
 
-
-
-
-
-
-
+        //testGooglePlaceDb();
+        // clearDb();
 
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);
