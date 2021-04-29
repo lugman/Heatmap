@@ -4,22 +4,31 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.heatmap.BuildConfig;
 import com.example.heatmap.R;
+import com.example.heatmap.databinding.InfowindowLayoutBinding;
 import com.example.heatmap.services.LatLngService;
 import com.example.heatmap.connections.ParametersPT;
 import com.example.heatmap.services.PopularTimesService;
 import com.example.heatmap.databinding.ActivityMapsBinding;
+import com.example.heatmap.utils.HeatmapDrawer;
 import com.example.heatmap.utils.MapsUtils;
+import com.example.heatmap.utils.PaintSearch;
 import com.example.heatmap.utils.PlacesUtils;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -67,6 +76,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
+
+        PaintSearch.setContext(this);
 
         testGooglePlaceDb();
 
@@ -206,6 +217,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         placesUtils.getLatLng(placeId);
     }
 
+
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -218,14 +231,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
         mapsUtils = new MapsUtils(mMap);
 
-        LatLng etsinf = new LatLng(39.48305714751131, -0.34783486024869137);
-        mapsUtils.setMarker(etsinf, "Etsinf");
+        LatLng etsinf = new LatLng(39.48305714751132, -0.34783486024869137);
+        Marker marker = mapsUtils.setMarker(etsinf, "Etsinf");
+
+
+        HeatmapDrawer heatmapDrawer = HeatmapDrawer.getInstance(mMap);
+        heatmapDrawer.drawCircle(etsinf,70);
 
         List<GooglePlace> googlePlaces = mapsUtils.createPlaces(15, etsinf);
 
-        mapsUtils.addHeatMap(googlePlaces);
+        //mapsUtils.addHeatMap(googlePlaces);
+
+
+
+
+
+
+
 
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);
