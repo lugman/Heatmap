@@ -4,7 +4,7 @@ import com.example.heatmap.apis.LatLngApi;
 
 import java.util.concurrent.TimeUnit;
 
-import data.model.PlaceSearch;
+import com.example.heatmap.data.model.PlaceSearch;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;

@@ -1,6 +1,9 @@
-package data.model;
+package com.example.heatmap.data.database;
 
 import android.content.Context;
+
+import com.example.heatmap.data.dao.SearchPlacesDao;
+import com.example.heatmap.data.model.SearchPlaces;
 
 import java.util.List;
 

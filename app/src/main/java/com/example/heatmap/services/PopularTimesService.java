@@ -10,7 +10,7 @@ import com.google.gson.GsonBuilder;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import data.model.GooglePlace;
+import com.example.heatmap.data.model.GooglePlace;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;

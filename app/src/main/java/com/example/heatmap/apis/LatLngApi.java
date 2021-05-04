@@ -1,6 +1,6 @@
 package com.example.heatmap.apis;
 
-import data.model.PlaceSearch;
+import com.example.heatmap.data.model.PlaceSearch;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

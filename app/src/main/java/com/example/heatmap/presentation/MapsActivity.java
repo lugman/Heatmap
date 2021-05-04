@@ -12,21 +12,17 @@ import android.view.View;
 
 import com.example.heatmap.BuildConfig;
 import com.example.heatmap.R;
-import com.example.heatmap.services.LatLngService;
 import com.example.heatmap.connections.ParametersPT;
 import com.example.heatmap.services.PopularTimesService;
 import com.example.heatmap.databinding.ActivityMapsBinding;
-import com.example.heatmap.utils.HeatmapDrawer;
 import com.example.heatmap.utils.MapsUtils;
 import com.example.heatmap.utils.PlacesUtils;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -34,20 +30,19 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 
 import java.util.Arrays;
 import java.util.List;
 
-import data.model.GooglePlace;
+import com.example.heatmap.data.model.GooglePlace;
 
 import static android.content.ContentValues.TAG;
 
-import data.model.GooglePlaceAccess;
-import data.model.GooglePlaceDatabase;
-import data.model.SearchPlaces;
-import data.model.SearchPlacesAccess;
-import data.model.PlaceSearch;
+import com.example.heatmap.data.database.GooglePlaceAccess;
+import com.example.heatmap.data.database.GooglePlaceDatabase;
+import com.example.heatmap.data.model.SearchPlaces;
+import com.example.heatmap.data.database.SearchPlacesAccess;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

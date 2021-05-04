@@ -1,4 +1,4 @@
-package data.model;
+package com.example.heatmap.data.database;
 
 import android.content.Context;
 
@@ -6,6 +6,12 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+
+import com.example.heatmap.data.dao.GooglePlaceDao;
+import com.example.heatmap.data.dao.SearchPlacesDao;
+import com.example.heatmap.data.model.GooglePlace;
+import com.example.heatmap.data.model.GooglePlaceConverters;
+import com.example.heatmap.data.model.SearchPlaces;
 
 @Database(entities = {GooglePlace.class, SearchPlaces.class}, version = 6, exportSchema = false)
 @TypeConverters(GooglePlaceConverters.class)

@@ -4,7 +4,7 @@ import com.example.heatmap.connections.ParametersPT;
 
 import java.util.List;
 
-import data.model.GooglePlace;
+import com.example.heatmap.data.model.GooglePlace;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Headers;
