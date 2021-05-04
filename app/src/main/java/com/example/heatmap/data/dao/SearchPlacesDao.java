@@ -1,4 +1,4 @@
-package data.model;
+package com.example.heatmap.data.dao;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -7,6 +7,8 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
+
+import com.example.heatmap.data.model.SearchPlaces;
 
 import java.util.List;
 

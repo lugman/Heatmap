@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import org.json.JSONException;
 
-import data.model.PlaceSearch;
+import com.example.heatmap.data.model.PlaceSearch;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

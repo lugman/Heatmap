@@ -1,4 +1,4 @@
-package data.model;
+package com.example.heatmap.data.model;
 
 import com.google.android.libraries.places.api.model.Place;
 

@@ -26,7 +26,7 @@ import com.google.maps.android.ui.IconGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
-import data.model.GooglePlace;
+import com.example.heatmap.data.model.GooglePlace;
 
 public class HeatmapDrawer {
     private GoogleMap mMap;
@@ -58,7 +58,7 @@ public class HeatmapDrawer {
         mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider((TileProvider) provider));
     }
 
-    public void clearHeatMap(){
+    public void clearHeatMap() {
         mOverlay.remove();
     }
 

@@ -3,7 +3,6 @@ package com.example.heatmap.utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
-
 import com.example.heatmap.R;
 import com.example.heatmap.connections.ParametersPT;
-import com.example.heatmap.presentation.MapsActivity;
 import com.example.heatmap.services.PopularTimesService;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -25,10 +21,9 @@ import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-import data.model.GooglePlace;
+import com.example.heatmap.data.model.GooglePlace;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.example.heatmap.BuildConfig;
 import com.example.heatmap.R;
-import com.example.heatmap.databinding.InfowindowLayoutBinding;
 import com.example.heatmap.services.LatLngService;
 import com.example.heatmap.connections.ParametersPT;
 import com.example.heatmap.services.PopularTimesService;
@@ -51,18 +50,18 @@ import data.model.GooglePlace;
 
 import static android.content.ContentValues.TAG;
 
-import data.model.GooglePlaceAccess;
-import data.model.GooglePlaceDatabase;
-import data.model.PlaceSearch;
+import com.example.heatmap.data.database.GooglePlaceAccess;
+import com.example.heatmap.data.database.GooglePlaceDatabase;
+import com.example.heatmap.data.model.SearchPlaces;
+import com.example.heatmap.data.database.SearchPlacesAccess;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-
-    //TODO: Change api key
+    // TODO: Change api key
     private final String apiKey = BuildConfig.API_KEY;
     private ActivityMapsBinding binding;
     private GoogleMap mMap;
@@ -212,7 +211,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getLatLng(String placeId) {
-        if (placesUtils == null) placesUtils = new PlacesUtils(apiKey, mMap);
+        if (placesUtils == null)
+            placesUtils = new PlacesUtils(apiKey, mMap);
 
         placesUtils.getLatLng(placeId);
     }

@@ -1,4 +1,4 @@
-package data.model;
+package com.example.heatmap.data.model;
 
 import androidx.room.TypeConverter;
 

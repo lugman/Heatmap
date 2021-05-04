@@ -1,4 +1,4 @@
-package data.model;
+package com.example.heatmap.data.model;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -244,7 +244,8 @@ public class GooglePlace {
                     '}';
         }
     }
-    class Coordinates{
+
+    public class Coordinates{
         private long placeOwnerId;
         public long getPlaceOwnerId(){return placeOwnerId;}
         public void setPlaceOwnerId(long placeOwnerId){this.placeOwnerId = placeOwnerId;}

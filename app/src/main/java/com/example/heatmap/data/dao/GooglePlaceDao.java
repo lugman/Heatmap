@@ -1,4 +1,4 @@
-package data.model;
+package com.example.heatmap.data.dao;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -8,9 +8,9 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
-import java.util.List;
+import com.example.heatmap.data.model.GooglePlace;
 
-import data.model.GooglePlace;
+import java.util.List;
 
 @Dao
 public interface GooglePlaceDao {

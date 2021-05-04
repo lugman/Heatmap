@@ -1,31 +1,18 @@
 package com.example.heatmap.utils;
 
-import android.app.AlertDialog;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.example.heatmap.R;
-import com.example.heatmap.connections.ParametersPT;
-import com.example.heatmap.services.PopularTimesService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Singleton;
 
-import data.model.GooglePlace;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.example.heatmap.data.model.GooglePlace;
 
 @Singleton
 public class MapsUtils {
