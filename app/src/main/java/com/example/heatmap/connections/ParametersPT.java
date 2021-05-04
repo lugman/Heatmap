@@ -1,8 +1,10 @@
 package com.example.heatmap.connections;
 
+import com.example.heatmap.BuildConfig;
+
 public class ParametersPT {
 
-    final String API_KEY = "AIzaSyCelNyXZrtQTVmxtmOZxnRcyskjZamkVG8";
+    final String API_KEY = BuildConfig.API_KEY;
     final String METHOD_GET = "get";
     final String METHOD_GET_ID = "get_id";
     final int DEFAULT_RADIUS = 180;
