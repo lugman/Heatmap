@@ -16,6 +16,9 @@ import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.heatmap.R;
 import com.example.heatmap.connections.ParametersPT;
+import com.example.heatmap.data.database.GooglePlaceAccess;
+import com.example.heatmap.data.database.GooglePlaceDatabase;
+import com.example.heatmap.data.database.SearchPlacesAccess;
 import com.example.heatmap.services.PopularTimesService;
 import com.example.heatmap.services.viewmodel.GooglePlaceViewModel;
 import com.google.android.gms.maps.GoogleMap;
@@ -73,6 +76,7 @@ public class PaintSearch {
                     HeatmapDrawer  heatmapDrawer = HeatmapDrawer.getInstance(map);
                     heatmapDrawer.drawCircle(placeLatLng,googlePlace.getCurrentPopularity());
                     setMarker(googlePlace.getCurrentPopularity());
+                    saveSearch(placeLatLng, googlePlace);
                     googlePlaceViewModel.setGooglePlace(googlePlace);
                 }
             }
@@ -150,6 +154,8 @@ public class PaintSearch {
 
                 googlePlaceViewModel.setGooglePlace(googlePlaces);
 
+                saveSearch(placeLatLng, googlePlaces, googlePlace.getName());
+
                 }else {
                     Toast.makeText(context,"Lo sentimos, no hemos podido encontrar información para este lugar :(",Toast.LENGTH_LONG).show();;
                 }
@@ -165,6 +171,33 @@ public class PaintSearch {
 
         });
     }
+
+    public void saveSearch(LatLng latLng, GooglePlace googlePlace){
+        SearchPlacesAccess searchPlacesAccess = new SearchPlacesAccess(context, GooglePlaceDatabase.getInstance(context));
+
+        long searchPlacesId = searchPlacesAccess.add(latLng,googlePlace.getName());
+        googlePlace.setSearchPlacesId(searchPlacesId);
+
+        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(context, GooglePlaceDatabase.getInstance(context));
+
+        googlePlaceAccess.add(googlePlace);
+    }
+
+    public void saveSearch(LatLng latLng, List<GooglePlace> googlePlaces, String origGooglePlaceName){
+        SearchPlacesAccess searchPlacesAccess = new SearchPlacesAccess(context, GooglePlaceDatabase.getInstance(context));
+
+        long searchPlacesId = searchPlacesAccess.add(latLng, origGooglePlaceName);
+
+        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(context, GooglePlaceDatabase.getInstance(context));
+
+        googlePlaces.forEach(googlePlace -> {
+            googlePlace.setSearchPlacesId(searchPlacesId);
+            googlePlaceAccess.add(googlePlace);
+        });
+
+
+    }
+
     public void setMarker(int popularity){
         CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter(LayoutInflater.from(context),popularity);
         map.setInfoWindowAdapter(infoWindowAdapter);

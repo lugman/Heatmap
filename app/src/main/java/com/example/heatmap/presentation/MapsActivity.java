@@ -258,21 +258,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(R.string.dialogSelectTitle)
-                    /*.setPositiveButton(R.string.Okay, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                        }
-                    })
-                    .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                        }
-                    })*/
                     .setItems(items, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             if(mapsUtils == null) mapsUtils = new MapsUtils(mMap);
-                            mapsUtils.clearHeatMap();
-                            mapsUtils.addHeatMap(searchPlaces.get(which).googlePlaces);
+                            //mapsUtils.clearHeatMap();
+                            mapsUtils.clearMap();
+                            List<GooglePlace> googlePlaces = searchPlaces.get(which).googlePlaces;
+                            int average = 0;
+                            for (GooglePlace item : googlePlaces ){
+                                average+=item.getCurrentPopularity();
+                            }
+                            average = average/googlePlaces.size();
+                            LatLng latLng = searchPlaces.get(which).searchPlaces.getLatLng();
+
+                            HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
+                            heatmapDrawer.drawCircle(latLng, average);
+
+                            PaintSearch.CustomInfoWindowAdapter infoWindowAdapter = new PaintSearch.CustomInfoWindowAdapter(LayoutInflater.from(getContext()),average);
+                            mMap.setInfoWindowAdapter(infoWindowAdapter);
+                            String name = searchPlaces.get(which).searchPlaces.getSearchedLocation();
+                            Marker lastMarker = mapsUtils.setMarker(latLng, name);
+                            lastMarker.showInfoWindow();
+                            //mapsUtils.addHeatMap(searchPlaces.get(which).googlePlaces);
                         }
                     });
             // Create the AlertDialog object and return it

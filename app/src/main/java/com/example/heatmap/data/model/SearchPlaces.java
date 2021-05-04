@@ -6,6 +6,8 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.Relation;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.List;
 
 @Entity(tableName = "searchplaces_table")
@@ -25,6 +27,17 @@ public class SearchPlaces {
 
     public void setSearchedLocation(String searchedLocation) {
         this.searchedLocation = searchedLocation;
+    }
+
+    @ColumnInfo(name = "search_latLng")
+    private LatLng latLng;
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
     }
 
     public SearchPlaces(){
