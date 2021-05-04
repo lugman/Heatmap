@@ -11,9 +11,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
+
 import com.example.heatmap.R;
 import com.example.heatmap.connections.ParametersPT;
 import com.example.heatmap.services.PopularTimesService;
+import com.example.heatmap.services.viewmodel.GooglePlaceViewModel;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -34,6 +38,7 @@ public class PaintSearch {
     private PopularTimesService populartimesService;
     private AlertDialog alertDialog;
     private Marker marker;
+    private static GooglePlaceViewModel googlePlaceViewModel;
 
     public PaintSearch(GoogleMap map, Marker marker) {
         this.map = map;
@@ -42,6 +47,7 @@ public class PaintSearch {
 
     public static void setContext(Context ctx) {
         context = ctx;
+        googlePlaceViewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(GooglePlaceViewModel.class);
     }
 
     public void drawHeat(String placeId, LatLng placeLatLng) {
@@ -55,7 +61,6 @@ public class PaintSearch {
 
                 MapsUtils mapsUtils = new MapsUtils(map);
                 GooglePlace googlePlace = response.body();
-                List<GooglePlace> googlePlaces = new ArrayList<>();
 
 
                 if(googlePlace.getPopulartimes()==null || googlePlace.getPopulartimes().size()==0){
@@ -64,13 +69,11 @@ public class PaintSearch {
                     List<GooglePlace> oneElement = new ArrayList<>();
                     oneElement.add(googlePlace);
                     googlePlace = setCurrentHour(oneElement).get(0);
-                    googlePlaces.add(googlePlace);
                     mapsUtils.setMarker(placeLatLng, googlePlace.getName());
-                    mapsUtils.addHeatMap(googlePlaces);
                     HeatmapDrawer  heatmapDrawer = HeatmapDrawer.getInstance(map);
                     heatmapDrawer.drawCircle(placeLatLng,googlePlace.getCurrentPopularity());
                     setMarker(googlePlace.getCurrentPopularity());
-
+                    googlePlaceViewModel.setGooglePlace(googlePlace);
                 }
             }
 
@@ -129,40 +132,28 @@ public class PaintSearch {
             @Override
             public void onResponse(Call<List<GooglePlace>> call, Response<List<GooglePlace>> response) {
 
-
-
                 List<GooglePlace> googlePlaces =  response.body();
 
-
-                Log.d("Response searchPlaces", String.valueOf(googlePlaces));
-
                 if (googlePlaces != null && googlePlaces.size() != 0){
-                    googlePlaces = setCurrentHour(googlePlaces);
+                googlePlaces = setCurrentHour(googlePlaces);
 
-                    int average = 0;
+                int average = 0;
 
-                    for (GooglePlace item : googlePlaces ){
-                        average+=item.getCurrentPopularity();
-                    }
-                    average = average/googlePlaces.size();
+                for (GooglePlace item : googlePlaces ){
+                    average+=item.getCurrentPopularity();
+                }
+                average = average/googlePlaces.size();
 
-                    googlePlace.setCurrentPopularity(average);
+                HeatmapDrawer  heatmapDrawer = HeatmapDrawer.getInstance(map);
+                heatmapDrawer.drawCircle(placeLatLng,average);
+                setMarker(average);
 
-                    List<GooglePlace> googlePlacesAverage =  new ArrayList<>();
+                googlePlaceViewModel.setGooglePlace(googlePlaces);
 
-                    googlePlacesAverage.add(googlePlace);
-                    // mapsUtils.addHeatMap(googlePlacesAverage);
-
-                    HeatmapDrawer  heatmapDrawer = HeatmapDrawer.getInstance(map);
-                    heatmapDrawer.drawCircle(placeLatLng,googlePlace.getCurrentPopularity());
-                    setMarker(googlePlace.getCurrentPopularity());
                 }else {
                     Toast.makeText(context,"Lo sentimos, no hemos podido encontrar información para este lugar :(",Toast.LENGTH_LONG).show();;
                 }
                 LoaderOff();
-
-
-
             }
 
             @Override
