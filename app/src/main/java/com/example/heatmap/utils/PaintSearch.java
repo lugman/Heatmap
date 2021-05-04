@@ -16,6 +16,8 @@ import com.example.heatmap.connections.ParametersPT;
 import com.example.heatmap.services.PopularTimesService;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,9 +33,11 @@ public class PaintSearch {
     private static Context context;
     private PopularTimesService populartimesService;
     private AlertDialog alertDialog;
+    private Marker marker;
 
-    public PaintSearch(GoogleMap map) {
+    public PaintSearch(GoogleMap map, Marker marker) {
         this.map = map;
+        this.marker = marker;
     }
 
     public static void setContext(Context ctx) {
@@ -55,7 +59,7 @@ public class PaintSearch {
 
 
                 if(googlePlace.getPopulartimes()==null || googlePlace.getPopulartimes().size()==0){
-                    showAlertNotFound(placeLatLng);
+                    showAlertNotFound(placeLatLng, googlePlace);
                 }else{
                     List<GooglePlace> oneElement = new ArrayList<>();
                     oneElement.add(googlePlace);
@@ -63,6 +67,9 @@ public class PaintSearch {
                     googlePlaces.add(googlePlace);
                     mapsUtils.setMarker(placeLatLng, googlePlace.getName());
                     mapsUtils.addHeatMap(googlePlaces);
+                    HeatmapDrawer  heatmapDrawer = HeatmapDrawer.getInstance(map);
+                    heatmapDrawer.drawCircle(placeLatLng,googlePlace.getCurrentPopularity());
+                    setMarker(googlePlace.getCurrentPopularity());
 
                 }
             }
@@ -73,7 +80,8 @@ public class PaintSearch {
             }
         });
     }
-    public  void showAlertNotFound(LatLng placeLatLng){
+    public  void showAlertNotFound(LatLng placeLatLng, GooglePlace googlePlace){
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         ViewGroup viewGroup = ((Activity) context).findViewById(android.R.id.content);
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alertview, viewGroup, false);
@@ -90,7 +98,7 @@ public class PaintSearch {
             @Override
             public void onClick(View v) {
                 alertDialog.dismiss();
-                searchPlaces(placeLatLng);
+                searchPlaces(placeLatLng,googlePlace);
                 LoaderOn();
             }
         });
@@ -102,19 +110,19 @@ public class PaintSearch {
         });
     }
 
-    public  void searchPlaces(LatLng placeLatLng){
+    public  void searchPlaces(LatLng placeLatLng, GooglePlace googlePlace){
 
 
         PopularTimesService populartimesService = PopularTimesService.getInstance();
         MapsUtils mapsUtils = new MapsUtils(map);
 
-        GooglePlace googlePlacesRandom = mapsUtils.createPlaces(1,placeLatLng, 0.01).get(0);
+        GooglePlace googlePlacesRandom = mapsUtils.createPlaces(1,placeLatLng, 0.1).get(0);
 
 
 
        Call<List<GooglePlace>> response2 = populartimesService.get(new ParametersPT(TypesUtils.getTypes(),
                new double[]{placeLatLng.latitude, placeLatLng.longitude}, new double[]{googlePlacesRandom.getLatitude(),googlePlacesRandom.getLongitude()},
-                20, 90));
+                20, 600));
 
 
         response2.enqueue(new Callback<List<GooglePlace>>() {
@@ -131,7 +139,23 @@ public class PaintSearch {
                 if (googlePlaces != null && googlePlaces.size() != 0){
                     googlePlaces = setCurrentHour(googlePlaces);
 
-                    mapsUtils.addHeatMap(googlePlaces);
+                    int average = 0;
+
+                    for (GooglePlace item : googlePlaces ){
+                        average+=item.getCurrentPopularity();
+                    }
+                    average = average/googlePlaces.size();
+
+                    googlePlace.setCurrentPopularity(average);
+
+                    List<GooglePlace> googlePlacesAverage =  new ArrayList<>();
+
+                    googlePlacesAverage.add(googlePlace);
+                    // mapsUtils.addHeatMap(googlePlacesAverage);
+
+                    HeatmapDrawer  heatmapDrawer = HeatmapDrawer.getInstance(map);
+                    heatmapDrawer.drawCircle(placeLatLng,googlePlace.getCurrentPopularity());
+                    setMarker(googlePlace.getCurrentPopularity());
                 }else {
                     Toast.makeText(context,"Lo sentimos, no hemos podido encontrar información para este lugar :(",Toast.LENGTH_LONG).show();;
                 }
@@ -149,6 +173,11 @@ public class PaintSearch {
             }
 
         });
+    }
+    public void setMarker(int popularity){
+        CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter(LayoutInflater.from(context),popularity);
+        map.setInfoWindowAdapter(infoWindowAdapter);
+        marker.showInfoWindow();
     }
 
     List<GooglePlace> setCurrentHour(List<GooglePlace> googlePlaces){
@@ -168,6 +197,31 @@ public class PaintSearch {
             }
         }
         return googlePlaces;
+    }
+
+    public static class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+
+        private LayoutInflater inflater;
+        private  int popularity;
+
+        public CustomInfoWindowAdapter(LayoutInflater inflater,int popularity){
+            this.inflater = inflater;
+            this.popularity = popularity;
+        }
+
+        @Override
+        public View getInfoContents(final Marker m) {
+            return null;
+        }
+
+
+        @Override
+        public View getInfoWindow(Marker m) {
+            View v = inflater.inflate(R.layout.infowindow_layout, null);
+            ((TextView)v.findViewById(R.id.info_window_placas)).setText("Público: "+popularity+"% ");
+            return v;
+        }
+
     }
 
     void LoaderOn() {

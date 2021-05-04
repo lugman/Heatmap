@@ -2,6 +2,7 @@ package com.example.heatmap.utils;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -74,6 +75,8 @@ public class MapsUtils {
         map.setMinZoomPreference(14.0f);
         map.setMaxZoomPreference(20.0f);
 
+        int color = 0x4400ff00;
+
         return map.addMarker(new MarkerOptions().position(latLng).title(title));
     }
 
@@ -87,7 +90,7 @@ public class MapsUtils {
      * @param googlePlaceList list of places with the data to plot the heatmap
      */
     public void addHeatMap(List<GooglePlace> googlePlaceList) {
-        if (heatmapDrawer == null) heatmapDrawer = new HeatmapDrawer(map);
+        if (heatmapDrawer == null) heatmapDrawer = HeatmapDrawer.getInstance(map);
 
         heatmapDrawer.makeHeatMap(googlePlaceList);
     }

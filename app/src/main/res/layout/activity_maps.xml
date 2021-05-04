@@ -50,7 +50,6 @@
             android:visibility="invisible"
             app:indicator="BallClipRotateMultiple"
             app:indicator_color="#ff00" />
-
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
