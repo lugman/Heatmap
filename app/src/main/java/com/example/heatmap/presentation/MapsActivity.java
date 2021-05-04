@@ -2,9 +2,13 @@ package com.example.heatmap.presentation;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -218,6 +222,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    private void clearDb() {
+        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(this,
+                GooglePlaceDatabase.getInstance(this));
+        SearchPlacesAccess searchPlacesAccess = SearchPlacesAccess.getInstance(this,
+                GooglePlaceDatabase.getInstance(this));
+        googlePlaceAccess.clearTable();
+        searchPlacesAccess.clearTable();
+    }
+
+    public void openSavedMenu(View view) {
+        SelectSavedSearchDialogFragment dialog = new SelectSavedSearchDialogFragment(mMap, mapsUtils);
+        dialog.show(getSupportFragmentManager(), "selectSaved");
+    }
+
+    public static class SelectSavedSearchDialogFragment extends DialogFragment {
+        private List<SearchPlaces.SearchPlacesWithGooglePlaces> searchPlaces;
+        private GoogleMap mMap;
+        private MapsUtils mapsUtils;
+
+        public SelectSavedSearchDialogFragment(GoogleMap map, MapsUtils mapsUtils){
+            mMap = map;
+            this.mapsUtils = mapsUtils;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            SearchPlacesAccess searchPlacesAccess = SearchPlacesAccess.getInstance(getContext(),
+                    GooglePlaceDatabase.getInstance(getContext()));
+            searchPlaces = searchPlacesAccess.getAll();
+            // Use the Builder class for convenient dialog construction
+            CharSequence[] items = new CharSequence[searchPlaces.size()];
+            for(int i = 0; i < searchPlaces.size(); i++){
+                items[i] = searchPlaces.get(i).searchPlaces.getSearchedLocation();
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.dialogSelectTitle)
+                    /*.setPositiveButton(R.string.Okay, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    })
+                    .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    })*/
+                    .setItems(items, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(mapsUtils == null) mapsUtils = new MapsUtils(mMap);
+                            mapsUtils.clearHeatMap();
+                            mapsUtils.addHeatMap(searchPlaces.get(which).googlePlaces);
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+    }
 
     /**
      * Manipulates the map once available.
