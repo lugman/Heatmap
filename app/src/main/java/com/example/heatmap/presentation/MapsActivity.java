@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.heatmap.BuildConfig;
 import com.example.heatmap.R;
+import com.example.heatmap.data.model.GooglePlace;
 import com.example.heatmap.services.LatLngService;
 import com.example.heatmap.connections.ParametersPT;
 import com.example.heatmap.services.PopularTimesService;
@@ -46,7 +47,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import data.model.GooglePlace;
 
 import static android.content.ContentValues.TAG;
 
