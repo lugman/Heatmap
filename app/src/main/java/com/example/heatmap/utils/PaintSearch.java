@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.example.heatmap.R;
 import com.example.heatmap.connections.ParametersPT;
+import com.example.heatmap.databinding.ActivityMapsBinding;
+import com.example.heatmap.presentation.InfoLocale;
 import com.example.heatmap.services.PopularTimesService;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -22,6 +24,8 @@ import java.util.Calendar;
 import java.util.List;
 
 import com.example.heatmap.data.model.GooglePlace;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -31,9 +35,13 @@ public class PaintSearch {
     private static Context context;
     private PopularTimesService populartimesService;
     private AlertDialog alertDialog;
+    private BottomSheetBehavior bottomSheetBehavior;
+    private ActivityMapsBinding binding;
+
 
     public PaintSearch(GoogleMap map) {
         this.map = map;
+
     }
 
     public static void setContext(Context ctx) {
@@ -43,6 +51,8 @@ public class PaintSearch {
     public void drawHeat(String placeId, LatLng placeLatLng) {
         //Buscamos actividad en este sitio
         populartimesService = PopularTimesService.getInstance();
+
+
 
         Call<GooglePlace> response = populartimesService.get_id(new ParametersPT(placeId));
         response.enqueue(new Callback<GooglePlace>() {
@@ -61,6 +71,7 @@ public class PaintSearch {
                     oneElement.add(googlePlace);
                     googlePlace = setCurrentHour(oneElement).get(0);
                     googlePlaces.add(googlePlace);
+
                     mapsUtils.setMarker(placeLatLng, googlePlace.getName());
                     mapsUtils.addHeatMap(googlePlaces);
 

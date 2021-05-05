@@ -1,6 +1,7 @@
 package com.example.heatmap.presentation;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -42,6 +43,7 @@ import com.example.heatmap.data.database.GooglePlaceAccess;
 import com.example.heatmap.data.database.GooglePlaceDatabase;
 import com.example.heatmap.data.model.SearchPlaces;
 import com.example.heatmap.data.database.SearchPlacesAccess;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,6 +59,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PlacesClient placesClient;
     private MapsUtils mapsUtils;
     private PlacesUtils placesUtils;
+    private  BottomSheetBehavior bottomSheetBehavior;
+    private InfoLocale infoLocale;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +76,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(binding.map.getId());
         mapFragment.getMapAsync(this);
+
+        bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.infoLocale));
+
 
         // ejemploLlamadaApi();
     }

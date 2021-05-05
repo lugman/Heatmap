@@ -25,6 +25,9 @@ public class PlacesUtils {
         this.map = map;
     }
 
+    public Marker getLastMarker(){
+        return lastMarker;
+    }
     public void removeLastMarker() {
         lastMarker.remove();
     }
