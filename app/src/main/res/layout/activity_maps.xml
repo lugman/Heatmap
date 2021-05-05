@@ -59,5 +59,7 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <include layout="@layout/info_locale" />
+    <include layout="@layout/info_locale"
+                android:id="@+id/infoLocale"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
