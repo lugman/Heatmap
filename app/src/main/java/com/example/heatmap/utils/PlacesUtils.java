@@ -56,7 +56,7 @@ public class PlacesUtils {
                           lastMarker = mapsUtils.setMarker(placeLatLng, name);
 
                         // Buscamos en populartimes su actividad
-                        PaintSearch paintSearch = new PaintSearch(map);
+                        PaintSearch paintSearch = new PaintSearch(map,lastMarker);
                         paintSearch.drawHeat(placeId,placeLatLng);
 
                     } catch (Exception e) {

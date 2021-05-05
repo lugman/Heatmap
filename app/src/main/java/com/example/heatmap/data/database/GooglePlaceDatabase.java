@@ -12,9 +12,10 @@ import com.example.heatmap.data.dao.SearchPlacesDao;
 import com.example.heatmap.data.model.GooglePlace;
 import com.example.heatmap.data.model.GooglePlaceConverters;
 import com.example.heatmap.data.model.SearchPlaces;
+import com.example.heatmap.data.model.SearchPlacesConverters;
 
-@Database(entities = {GooglePlace.class, SearchPlaces.class}, version = 6, exportSchema = false)
-@TypeConverters(GooglePlaceConverters.class)
+@Database(entities = {GooglePlace.class, SearchPlaces.class}, version = 7, exportSchema = false)
+@TypeConverters({GooglePlaceConverters.class, SearchPlacesConverters.class})
 public abstract class GooglePlaceDatabase extends RoomDatabase {
     private  static  GooglePlaceDatabase googlePlaceDatabase;
 

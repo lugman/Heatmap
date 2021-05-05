@@ -11,21 +11,26 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
+
 import com.example.heatmap.R;
 import com.example.heatmap.connections.ParametersPT;
-import com.example.heatmap.databinding.ActivityMapsBinding;
-import com.example.heatmap.presentation.InfoLocale;
+import com.example.heatmap.data.database.GooglePlaceAccess;
+import com.example.heatmap.data.database.GooglePlaceDatabase;
+import com.example.heatmap.data.database.SearchPlacesAccess;
 import com.example.heatmap.services.PopularTimesService;
+import com.example.heatmap.services.viewmodel.GooglePlaceViewModel;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import com.example.heatmap.data.model.GooglePlace;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,24 +40,22 @@ public class PaintSearch {
     private static Context context;
     private PopularTimesService populartimesService;
     private AlertDialog alertDialog;
-    private BottomSheetBehavior bottomSheetBehavior;
-    private ActivityMapsBinding binding;
+    private Marker marker;
+    private static GooglePlaceViewModel googlePlaceViewModel;
 
-
-    public PaintSearch(GoogleMap map) {
+    public PaintSearch(GoogleMap map, Marker marker) {
         this.map = map;
-
+        this.marker = marker;
     }
 
     public static void setContext(Context ctx) {
         context = ctx;
+        googlePlaceViewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(GooglePlaceViewModel.class);
     }
 
     public void drawHeat(String placeId, LatLng placeLatLng) {
         //Buscamos actividad en este sitio
         populartimesService = PopularTimesService.getInstance();
-
-
 
         Call<GooglePlace> response = populartimesService.get_id(new ParametersPT(placeId));
         response.enqueue(new Callback<GooglePlace>() {
@@ -61,20 +64,20 @@ public class PaintSearch {
 
                 MapsUtils mapsUtils = new MapsUtils(map);
                 GooglePlace googlePlace = response.body();
-                List<GooglePlace> googlePlaces = new ArrayList<>();
 
 
                 if(googlePlace.getPopulartimes()==null || googlePlace.getPopulartimes().size()==0){
-                    showAlertNotFound(placeLatLng);
+                    showAlertNotFound(placeLatLng, googlePlace);
                 }else{
                     List<GooglePlace> oneElement = new ArrayList<>();
                     oneElement.add(googlePlace);
                     googlePlace = setCurrentHour(oneElement).get(0);
-                    googlePlaces.add(googlePlace);
-
                     mapsUtils.setMarker(placeLatLng, googlePlace.getName());
-                    mapsUtils.addHeatMap(googlePlaces);
-
+                    HeatmapDrawer  heatmapDrawer = HeatmapDrawer.getInstance(map);
+                    heatmapDrawer.drawCircle(placeLatLng,googlePlace.getCurrentPopularity());
+                    setMarker(googlePlace.getCurrentPopularity());
+                    saveSearch(placeLatLng, googlePlace);
+                    googlePlaceViewModel.setGooglePlace(googlePlace);
                 }
             }
 
@@ -84,7 +87,8 @@ public class PaintSearch {
             }
         });
     }
-    public  void showAlertNotFound(LatLng placeLatLng){
+    public  void showAlertNotFound(LatLng placeLatLng, GooglePlace googlePlace){
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         ViewGroup viewGroup = ((Activity) context).findViewById(android.R.id.content);
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alertview, viewGroup, false);
@@ -101,7 +105,7 @@ public class PaintSearch {
             @Override
             public void onClick(View v) {
                 alertDialog.dismiss();
-                searchPlaces(placeLatLng);
+                searchPlaces(placeLatLng,googlePlace);
                 LoaderOn();
             }
         });
@@ -113,43 +117,49 @@ public class PaintSearch {
         });
     }
 
-    public  void searchPlaces(LatLng placeLatLng){
+    public  void searchPlaces(LatLng placeLatLng, GooglePlace googlePlace){
 
 
         PopularTimesService populartimesService = PopularTimesService.getInstance();
         MapsUtils mapsUtils = new MapsUtils(map);
 
-        GooglePlace googlePlacesRandom = mapsUtils.createPlaces(1,placeLatLng, 0.01).get(0);
+        GooglePlace googlePlacesRandom = mapsUtils.createPlaces(1,placeLatLng, 0.1).get(0);
 
 
 
        Call<List<GooglePlace>> response2 = populartimesService.get(new ParametersPT(TypesUtils.getTypes(),
                new double[]{placeLatLng.latitude, placeLatLng.longitude}, new double[]{googlePlacesRandom.getLatitude(),googlePlacesRandom.getLongitude()},
-                20, 90));
+                20, 600));
 
 
         response2.enqueue(new Callback<List<GooglePlace>>() {
             @Override
             public void onResponse(Call<List<GooglePlace>> call, Response<List<GooglePlace>> response) {
 
-
-
                 List<GooglePlace> googlePlaces =  response.body();
 
-
-                Log.d("Response searchPlaces", String.valueOf(googlePlaces));
-
                 if (googlePlaces != null && googlePlaces.size() != 0){
-                    googlePlaces = setCurrentHour(googlePlaces);
+                googlePlaces = setCurrentHour(googlePlaces);
 
-                    mapsUtils.addHeatMap(googlePlaces);
+                int average = 0;
+
+                for (GooglePlace item : googlePlaces ){
+                    average+=item.getCurrentPopularity();
+                }
+                average = average/googlePlaces.size();
+
+                HeatmapDrawer  heatmapDrawer = HeatmapDrawer.getInstance(map);
+                heatmapDrawer.drawCircle(placeLatLng,average);
+                setMarker(average);
+
+                googlePlaceViewModel.setGooglePlace(googlePlaces);
+
+                saveSearch(placeLatLng, googlePlaces, googlePlace.getName());
+
                 }else {
                     Toast.makeText(context,"Lo sentimos, no hemos podido encontrar información para este lugar :(",Toast.LENGTH_LONG).show();;
                 }
                 LoaderOff();
-
-
-
             }
 
             @Override
@@ -160,6 +170,38 @@ public class PaintSearch {
             }
 
         });
+    }
+
+    public void saveSearch(LatLng latLng, GooglePlace googlePlace){
+        SearchPlacesAccess searchPlacesAccess = new SearchPlacesAccess(context, GooglePlaceDatabase.getInstance(context));
+
+        long searchPlacesId = searchPlacesAccess.add(latLng,googlePlace.getName());
+        googlePlace.setSearchPlacesId(searchPlacesId);
+
+        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(context, GooglePlaceDatabase.getInstance(context));
+
+        googlePlaceAccess.add(googlePlace);
+    }
+
+    public void saveSearch(LatLng latLng, List<GooglePlace> googlePlaces, String origGooglePlaceName){
+        SearchPlacesAccess searchPlacesAccess = new SearchPlacesAccess(context, GooglePlaceDatabase.getInstance(context));
+
+        long searchPlacesId = searchPlacesAccess.add(latLng, origGooglePlaceName);
+
+        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(context, GooglePlaceDatabase.getInstance(context));
+
+        googlePlaces.forEach(googlePlace -> {
+            googlePlace.setSearchPlacesId(searchPlacesId);
+            googlePlaceAccess.add(googlePlace);
+        });
+
+
+    }
+
+    public void setMarker(int popularity){
+        CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter(LayoutInflater.from(context),popularity);
+        map.setInfoWindowAdapter(infoWindowAdapter);
+        marker.showInfoWindow();
     }
 
     List<GooglePlace> setCurrentHour(List<GooglePlace> googlePlaces){
@@ -179,6 +221,31 @@ public class PaintSearch {
             }
         }
         return googlePlaces;
+    }
+
+    public static class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+
+        private LayoutInflater inflater;
+        private  int popularity;
+
+        public CustomInfoWindowAdapter(LayoutInflater inflater,int popularity){
+            this.inflater = inflater;
+            this.popularity = popularity;
+        }
+
+        @Override
+        public View getInfoContents(final Marker m) {
+            return null;
+        }
+
+
+        @Override
+        public View getInfoWindow(Marker m) {
+            View v = inflater.inflate(R.layout.infowindow_layout, null);
+            ((TextView)v.findViewById(R.id.info_window_placas)).setText("Público: "+popularity+"% ");
+            return v;
+        }
+
     }
 
     void LoaderOn() {
