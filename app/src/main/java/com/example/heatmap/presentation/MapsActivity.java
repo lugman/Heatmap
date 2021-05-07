@@ -1,31 +1,28 @@
 package com.example.heatmap.presentation;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.example.heatmap.BuildConfig;
 import com.example.heatmap.R;
 import com.example.heatmap.data.model.GooglePlace;
-import com.example.heatmap.services.LatLngService;
 import com.example.heatmap.connections.ParametersPT;
+import com.example.heatmap.databinding.BottomFragmentBinding;
 import com.example.heatmap.services.PopularTimesService;
 import com.example.heatmap.databinding.ActivityMapsBinding;
 import com.example.heatmap.services.viewmodel.GooglePlaceViewModel;
@@ -34,15 +31,11 @@ import com.example.heatmap.utils.MapsUtils;
 import com.example.heatmap.utils.PaintSearch;
 import com.example.heatmap.utils.PlacesUtils;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -50,14 +43,9 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 
-import java.io.Console;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 
 import static android.content.ContentValues.TAG;
@@ -84,8 +72,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PlacesClient placesClient;
     private MapsUtils mapsUtils;
     private PlacesUtils placesUtils;
-    private static GooglePlaceViewModel googlePlaceViewModel;
     private  BottomSheetBehavior bottomSheetBehavior;
+    private View bottomFragContainer;
+    private Button button;
+    private GooglePlaceViewModel googlePlaceViewModel;
 
 
     @Override
@@ -95,12 +85,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
 
-
-
-
-
         PaintSearch.setContext(this);
-
 
         testGooglePlaceDb();
 
@@ -111,55 +96,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(binding.map.getId());
         mapFragment.getMapAsync(this);
 
-        googlePlaceViewModel = new ViewModelProvider(this).get(GooglePlaceViewModel.class);
-        final Observer<? super List<GooglePlace>> observerGooglePlace = new Observer<List<GooglePlace>>() {
-            @Override
-            public void onChanged(@Nullable final List<GooglePlace> newPlace) {
-                // Update the UI, in this case, a TextView.
-                updateDays(newPlace.get(0));
-            }
-        };
 
 
-        // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
-        googlePlaceViewModel.getGooglePlace().observe(this, observerGooglePlace);
-        bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.infoLocale));
         //ejemploLlamadaApi();
 
+       BottomFragment bottomFrag = BottomFragment.newInstance();
+    //    bottomFrag.show(getSupportFragmentManager(),"tag");
 
 
-        // Para hacer pruebas de los progressBars a ver si actualicen
+        //Create and initialize the fragment
 
-        binding.infoLocale.pbMonday.setMax(50);
-        binding.infoLocale.pbMonday.setProgress(25);
-        Log.i("ben tag info", binding.infoLocale.pbMonday.getProgress()+" ");
+        bottomFragContainer = findViewById(R.id.infoFragmentHolder);
+        Fragment bottomFragment = new BottomFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.infoFragmentHolder, BottomFragment.class, null).commit();
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomFragContainer);
+
+
+        //BottomFragmentBinding binding2 = BottomFragmentBinding.inflate(getLayoutInflater());
+       // binding2.tvMonday.setText("Set test 2");
+       // bottomSheetBehavior.isFitToContents = false;
+      //  bottomSheetBehavior.halfExpandedRatio = 0.6f;
+
+
+
+       // Log.i("tag binding name",binding.tvInfoLocale.getText().toString());
 
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
 
+                Log.i("State of frag: ", ""+newState);
                 if(newState==BottomSheetBehavior.STATE_EXPANDED){
                     bottomSheet.requestLayout();
                     bottomSheet.invalidate();
-                    Log.i("ben tag info 2", binding.infoLocale.pbMonday.getProgress()+" ");
 
                 }
             }
-
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
             }
         });
 
-
-
+        googlePlaceViewModel = new ViewModelProvider(this).get(GooglePlaceViewModel.class);
+        LiveData<List<GooglePlace>> googlePlaceList = googlePlaceViewModel.getGooglePlace();
+        Observer<List<GooglePlace>> observer = new Observer<List<GooglePlace>>() {
+            @Override
+            public void onChanged(List<GooglePlace> googlePlaceList) {
+               BottomFragment botFragClass = new BottomFragment();
+             //  botFragClass.updateDays(googlePlaceList.get(0));
+                updateDays(googlePlaceList.get(0));
+            }
+        };
+        googlePlaceList.observeForever(observer);
     }
 
-
-
-    private void updateDays(GooglePlace newPlace){
-        binding.infoLocale.getRoot().setVisibility(View.VISIBLE);
+    public void updateDays(GooglePlace newPlace){
         List<GooglePlace.ItemPopularTimes> popTimes = newPlace.getPopulartimes();
         for (int i = 0; i < 7; i++) {
             if(popTimes.get(i) != null) {
@@ -170,37 +162,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 average = average / data.length;
 
-             String dayName = popTimes.get(i).getName();
+                String dayName = popTimes.get(i).getName();
+                int viewId = 0;
                 switch(dayName){
-                    case "Monday": binding.infoLocale.pbMonday.setProgress(average);
+                    case "Monday": viewId = R.id.pbMonday;
                         Log.i("ben tag", dayName +" "+ average);
                         break;
-                    case "Tuesday": binding.infoLocale.pbTuesday.setProgress(average);
+                    case "Tuesday": viewId = R.id.pbTuesday;
                         Log.i("ben tag", dayName +" "+ average);
                         break;
-                    case "Wednesday": binding.infoLocale.pbWeds.setProgress(average);
+                    case "Wednesday": viewId = R.id.pbWeds;
                         Log.i("ben tag", dayName +" "+ average);
                         break;
-                    case "Thursday": binding.infoLocale.pbThursday.setProgress(average);
+                    case "Thursday": viewId = R.id.pbThursday;
                         Log.i("ben tag", dayName +" "+ average);
                         break;
-                    case "Friday": binding.infoLocale.pbFriday.setProgress(average);
+                    case "Friday": viewId = R.id.pbFriday;
                         Log.i("ben tag", dayName +" "+ average);
                         break;
-                    case "Saturday": binding.infoLocale.pbSaturday.setProgress(average);
+                    case "Saturday": viewId = R.id.pbSaturday;
                         Log.i("ben tag", dayName +" "+ average);
                         break;
-                    case "Sunday": binding.infoLocale.pbSunday.setProgress(average);
+                    case "Sunday": viewId = R.id.pbSunday;
                         Log.i("ben tag", dayName +" "+ average);
                         break;
                 }
+                Log.i("ben view id", " View ID: "+viewId);
+                ProgressBar bar =  findViewById(viewId);
+                bar.setProgress(average);
             }
         }
 
-       final ConstraintLayout infoLocaleLayout = (ConstraintLayout) findViewById(R.id.infoLocale);
-
-        infoLocaleLayout.invalidate();
     }
+
+
 
     private void testGooglePlaceDb() {
         GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(this, GooglePlaceDatabase.getInstance(this));
