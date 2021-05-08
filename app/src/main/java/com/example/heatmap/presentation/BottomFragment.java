@@ -87,28 +87,28 @@ public class BottomFragment extends Fragment {
                 int viewId = 0;
                 switch(dayName){
                     case "Monday": viewId = R.id.pbMonday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Tuesday": viewId = R.id.pbTuesday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Wednesday": viewId = R.id.pbWeds;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Thursday": viewId = R.id.pbThursday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Friday": viewId = R.id.pbFriday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Saturday": viewId = R.id.pbSaturday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Sunday": viewId = R.id.pbSunday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                 }
-                Log.i("ben view id", " View ID: "+viewId);
+                Log.i("ben_view id", " View ID: "+viewId);
               //  ProgressBar bar =  findViewById(viewId);
               // bar.setProgress(average);
             }

@@ -76,6 +76,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private View bottomFragContainer;
     private Button button;
     private GooglePlaceViewModel googlePlaceViewModel;
+    private int[] dayAverage;
 
 
     @Override
@@ -153,41 +154,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void updateDays(GooglePlace newPlace){
         List<GooglePlace.ItemPopularTimes> popTimes = newPlace.getPopulartimes();
+        dayAverage = new int[7];
         for (int i = 0; i < 7; i++) {
             if(popTimes.get(i) != null) {
                 int average = 0;
                 int[] data = popTimes.get(i).getData();
+                int notZeroEntry = 0;
                 for(int j=0; j<data.length; j++){
-                    average = average + data[j];
+                    average += data[j];
+                    if (data[j] > 0) notZeroEntry++;
                 }
-                average = average / data.length;
+                if (notZeroEntry == 0) {
+                    for (int j = 0; j < 5; j++) {
+                        average += dayAverage[j];
+                    }
+                    average /= 5;
+                }
+                else {
+                    average /= notZeroEntry;
+                }
+                dayAverage[i] = average;
 
                 String dayName = popTimes.get(i).getName();
                 int viewId = 0;
                 switch(dayName){
                     case "Monday": viewId = R.id.pbMonday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Tuesday": viewId = R.id.pbTuesday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Wednesday": viewId = R.id.pbWeds;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Thursday": viewId = R.id.pbThursday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Friday": viewId = R.id.pbFriday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Saturday": viewId = R.id.pbSaturday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                     case "Sunday": viewId = R.id.pbSunday;
-                        Log.i("ben tag", dayName +" "+ average);
+                        Log.i("ben_tag", dayName +" "+ average);
                         break;
                 }
-                Log.i("ben view id", " View ID: "+viewId);
+                Log.i("ben_view id", " View ID: "+viewId);
                 ProgressBar bar =  findViewById(viewId);
                 bar.setProgress(average);
             }
@@ -366,11 +379,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //mapsUtils.clearHeatMap();
                             mapsUtils.clearMap();
                             List<GooglePlace> googlePlaces = searchPlaces.get(which).googlePlaces;
-                            int average = 0;
-                            for (GooglePlace item : googlePlaces ){
-                                average+=item.getCurrentPopularity();
-                            }
-                            average = average/googlePlaces.size();
+                            int average = PaintSearch.getAverage(googlePlaces);
                             LatLng latLng = searchPlaces.get(which).searchPlaces.getLatLng();
 
                             HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
@@ -387,6 +396,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Create the AlertDialog object and return it
             return builder.create();
         }
+
     }
 
     /**

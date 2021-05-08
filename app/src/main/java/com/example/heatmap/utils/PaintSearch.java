@@ -141,20 +141,15 @@ public class PaintSearch {
                 if (googlePlaces != null && googlePlaces.size() != 0){
                 googlePlaces = setCurrentHour(googlePlaces);
 
-                int average = 0;
-
-                for (GooglePlace item : googlePlaces ){
-                    average+=item.getCurrentPopularity();
-                }
-                average = average/googlePlaces.size();
+                int average = getAverage(googlePlaces);
 
                 HeatmapDrawer  heatmapDrawer = HeatmapDrawer.getInstance(map);
                 heatmapDrawer.drawCircle(placeLatLng,average);
                 setMarker(average);
 
-                googlePlaceViewModel.setGooglePlace(googlePlaces);
-
                 saveSearch(placeLatLng, googlePlaces, googlePlace.getName());
+
+                googlePlaceViewModel.setGooglePlace(googlePlaces);
 
                 }else {
                     Toast.makeText(context,"Lo sentimos, no hemos podido encontrar información para este lugar :(",Toast.LENGTH_LONG).show();;
@@ -196,6 +191,32 @@ public class PaintSearch {
         });
 
 
+    }
+
+    public static int getAverage(List<GooglePlace> googlePlaces) {
+        int average = 0;
+        int notZeroEntry = 0;
+        for (GooglePlace item : googlePlaces ){
+            average+=item.getCurrentPopularity();
+            if (item.getCurrentPopularity() > 0) notZeroEntry++;
+        }
+
+        if (notZeroEntry > 0) average /= notZeroEntry;
+        else {
+            notZeroEntry = 0;
+            for (GooglePlace item : googlePlaces){
+                List<GooglePlace.ItemPopularTimes> popularTimes = item.getPopulartimes();
+                for (GooglePlace.ItemPopularTimes itemPopularTimes: popularTimes) {
+                    for (int popularity : itemPopularTimes.getData()) {
+                        average += popularity;
+                        if (popularity > 0) notZeroEntry++;
+                    }
+                }
+            }
+        }
+
+        average /= notZeroEntry;
+        return average;
     }
 
     public void setMarker(int popularity){

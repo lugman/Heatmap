@@ -33,16 +33,16 @@ android:orientation="vertical">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 
-<ProgressBar
-    android:id="@+id/pbMonday"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="300dp"
-    android:max="50"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toTopOf="@+id/tvTuesday"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="@+id/tvMonday"
-    app:layout_constraintVertical_bias="0.13" />
+    <ProgressBar
+        android:id="@+id/pbMonday"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        app:layout_constraintBottom_toTopOf="@+id/tvTuesday"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvMonday"
+        app:layout_constraintVertical_bias="0.13" />
 
 <TextView
     android:id="@+id/tvTuesday"
@@ -55,16 +55,16 @@ android:orientation="vertical">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/tvMonday" />
 
-<ProgressBar
-    android:id="@+id/pbTuesday"
-    android:max="50"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="300dp"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toTopOf="@+id/tvWeds"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="@+id/tvTuesday"
-    app:layout_constraintVertical_bias="0.127" />
+    <ProgressBar
+        android:id="@+id/pbTuesday"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        app:layout_constraintBottom_toTopOf="@+id/tvWeds"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvTuesday"
+        app:layout_constraintVertical_bias="0.127" />
 
 <TextView
     android:id="@+id/tvWeds"
@@ -77,16 +77,16 @@ android:orientation="vertical">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/tvTuesday" />
 
-<ProgressBar
-    android:id="@+id/pbWeds"
-    android:max="50"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="300dp"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toTopOf="@+id/tvThursday"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="@+id/tvWeds"
-    app:layout_constraintVertical_bias="0.13" />
+    <ProgressBar
+        android:id="@+id/pbWeds"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        app:layout_constraintBottom_toTopOf="@+id/tvThursday"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvWeds"
+        app:layout_constraintVertical_bias="0.13" />
 
 <TextView
     android:id="@+id/tvThursday"
@@ -99,18 +99,18 @@ android:orientation="vertical">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/tvWeds" />
 
-<ProgressBar
-    android:id="@+id/pbThursday"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="300dp"
-    android:max="50"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toTopOf="@+id/tvFriday"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="1.0"
-    app:layout_constraintStart_toEndOf="@+id/tvThursday"
-    app:layout_constraintTop_toTopOf="@+id/tvThursday"
-    app:layout_constraintVertical_bias="0.13" />
+    <ProgressBar
+        android:id="@+id/pbThursday"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        app:layout_constraintBottom_toTopOf="@+id/tvFriday"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/tvThursday"
+        app:layout_constraintTop_toTopOf="@+id/tvThursday"
+        app:layout_constraintVertical_bias="0.13" />
 
 <TextView
     android:id="@+id/tvFriday"
@@ -123,16 +123,16 @@ android:orientation="vertical">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/tvThursday" />
 
-<ProgressBar
-    android:id="@+id/pbFriday"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="300dp"
-    android:max="50"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toTopOf="@+id/tvSaturday"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="@+id/tvFriday"
-    app:layout_constraintVertical_bias="0.13" />
+    <ProgressBar
+        android:id="@+id/pbFriday"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        app:layout_constraintBottom_toTopOf="@+id/tvSaturday"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvFriday"
+        app:layout_constraintVertical_bias="0.13" />
 
 <TextView
     android:id="@+id/tvSaturday"
@@ -145,15 +145,15 @@ android:orientation="vertical">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/tvFriday" />
 
-<ProgressBar
-    android:id="@+id/pbSaturday"
-    android:max="50"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="300dp"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toBottomOf="@+id/tvSaturday"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="@+id/tvSaturday" />
+    <ProgressBar
+        android:id="@+id/pbSaturday"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        app:layout_constraintBottom_toBottomOf="@+id/tvSaturday"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvSaturday" />
 
 <TextView
     android:id="@+id/tvSunday"
@@ -166,15 +166,15 @@ android:orientation="vertical">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/tvSaturday" />
 
-<ProgressBar
-    android:id="@+id/pbSunday"
-    android:max="50"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="300dp"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toBottomOf="@+id/tvSunday"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="@+id/tvSunday" />
+    <ProgressBar
+        android:id="@+id/pbSunday"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        app:layout_constraintBottom_toBottomOf="@+id/tvSunday"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvSunday" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
