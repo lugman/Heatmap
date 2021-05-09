@@ -327,8 +327,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        double lat = location == null ? 27.7567 : location.getLatitude();
-        double lng = location == null ? 43.68333 : location.getLongitude();
+        double lat = location == null ? 40.40881558648764 : location.getLatitude();
+        double lng = location == null ? -3.7065358877016927 : location.getLongitude();
         LatLng myLocation = new LatLng(lat, lng);
 
         mapsUtils.moveCamera(myLocation);
