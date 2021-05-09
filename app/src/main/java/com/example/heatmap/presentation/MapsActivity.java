@@ -2,6 +2,7 @@ package com.example.heatmap.presentation;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -9,14 +10,24 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.heatmap.BuildConfig;
 import com.example.heatmap.R;
@@ -57,6 +68,7 @@ import com.example.heatmap.data.database.SearchPlacesAccess;
 
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -65,44 +77,55 @@ import retrofit2.Response;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     // TODO: Change api key
-    private final String apiKey = BuildConfig.API_KEY;
+    private String apiKey; // = BuildConfig.API_KEY;
     private ActivityMapsBinding binding;
     private GoogleMap mMap;
     private Marker lastMarker;
     private PlacesClient placesClient;
     private MapsUtils mapsUtils;
     private PlacesUtils placesUtils;
-    private  BottomSheetBehavior bottomSheetBehavior;
+    private BottomSheetBehavior bottomSheetBehavior;
     private View bottomFragContainer;
     private Button button;
     private GooglePlaceViewModel googlePlaceViewModel;
     private int[] dayAverage;
+    private SharedPreferences.Editor editor;
+    private SharedPreferences sharedPrefs;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedPrefs.edit();
+
+        if (sharedPrefs.getString("apiKey", "").equals("")) keyDialog();
+        else {
+            apiKey = sharedPrefs.getString("apiKey", "");
+            initializePlaces(apiKey);
+        }
+
+        FloatingActionButton but = binding.preferencesButton;
+
+        but.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                keyDialog();
+            }
+        });
 
         PaintSearch.setContext(this);
 
-        testGooglePlaceDb();
-
-        initializePlaces(apiKey);
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(binding.map.getId());
-        mapFragment.getMapAsync(this);
-
-
+        //testGooglePlaceDb();
 
         //ejemploLlamadaApi();
 
-       BottomFragment bottomFrag = BottomFragment.newInstance();
-    //    bottomFrag.show(getSupportFragmentManager(),"tag");
+        BottomFragment bottomFrag = BottomFragment.newInstance();
+        //    bottomFrag.show(getSupportFragmentManager(),"tag");
 
 
         //Create and initialize the fragment
@@ -114,25 +137,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         //BottomFragmentBinding binding2 = BottomFragmentBinding.inflate(getLayoutInflater());
-       // binding2.tvMonday.setText("Set test 2");
-       // bottomSheetBehavior.isFitToContents = false;
-      //  bottomSheetBehavior.halfExpandedRatio = 0.6f;
+        // binding2.tvMonday.setText("Set test 2");
+        // bottomSheetBehavior.isFitToContents = false;
+        //  bottomSheetBehavior.halfExpandedRatio = 0.6f;
 
 
-
-       // Log.i("tag binding name",binding.tvInfoLocale.getText().toString());
+        // Log.i("tag binding name",binding.tvInfoLocale.getText().toString());
 
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
 
-                Log.i("State of frag: ", ""+newState);
-                if(newState==BottomSheetBehavior.STATE_EXPANDED){
+                Log.i("State of frag: ", "" + newState);
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     bottomSheet.requestLayout();
                     bottomSheet.invalidate();
 
                 }
             }
+
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
@@ -144,23 +167,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Observer<List<GooglePlace>> observer = new Observer<List<GooglePlace>>() {
             @Override
             public void onChanged(List<GooglePlace> googlePlaceList) {
-               BottomFragment botFragClass = new BottomFragment();
-             //  botFragClass.updateDays(googlePlaceList.get(0));
+                BottomFragment botFragClass = new BottomFragment();
+                //  botFragClass.updateDays(googlePlaceList.get(0));
                 updateDays(googlePlaceList.get(0));
             }
         };
         googlePlaceList.observeForever(observer);
     }
 
-    public void updateDays(GooglePlace newPlace){
+    public void updateDays(GooglePlace newPlace) {
         List<GooglePlace.ItemPopularTimes> popTimes = newPlace.getPopulartimes();
         dayAverage = new int[7];
         for (int i = 0; i < 7; i++) {
-            if(popTimes.get(i) != null) {
+            if (popTimes.get(i) != null) {
                 int average = 0;
                 int[] data = popTimes.get(i).getData();
                 int notZeroEntry = 0;
-                for(int j=0; j<data.length; j++){
+                for (int j = 0; j < data.length; j++) {
                     average += data[j];
                     if (data[j] > 0) notZeroEntry++;
                 }
@@ -169,133 +192,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         average += dayAverage[j];
                     }
                     average /= 5;
-                }
-                else {
+                } else {
                     average /= notZeroEntry;
                 }
                 dayAverage[i] = average;
 
                 String dayName = popTimes.get(i).getName();
                 int viewId = 0;
-                switch(dayName){
-                    case "Monday": viewId = R.id.pbMonday;
-                        Log.i("ben_tag", dayName +" "+ average);
+                switch (dayName) {
+                    case "Monday":
+                        viewId = R.id.pbMonday;
+                        Log.i("ben_tag", dayName + " " + average);
                         break;
-                    case "Tuesday": viewId = R.id.pbTuesday;
-                        Log.i("ben_tag", dayName +" "+ average);
+                    case "Tuesday":
+                        viewId = R.id.pbTuesday;
+                        Log.i("ben_tag", dayName + " " + average);
                         break;
-                    case "Wednesday": viewId = R.id.pbWeds;
-                        Log.i("ben_tag", dayName +" "+ average);
+                    case "Wednesday":
+                        viewId = R.id.pbWeds;
+                        Log.i("ben_tag", dayName + " " + average);
                         break;
-                    case "Thursday": viewId = R.id.pbThursday;
-                        Log.i("ben_tag", dayName +" "+ average);
+                    case "Thursday":
+                        viewId = R.id.pbThursday;
+                        Log.i("ben_tag", dayName + " " + average);
                         break;
-                    case "Friday": viewId = R.id.pbFriday;
-                        Log.i("ben_tag", dayName +" "+ average);
+                    case "Friday":
+                        viewId = R.id.pbFriday;
+                        Log.i("ben_tag", dayName + " " + average);
                         break;
-                    case "Saturday": viewId = R.id.pbSaturday;
-                        Log.i("ben_tag", dayName +" "+ average);
+                    case "Saturday":
+                        viewId = R.id.pbSaturday;
+                        Log.i("ben_tag", dayName + " " + average);
                         break;
-                    case "Sunday": viewId = R.id.pbSunday;
-                        Log.i("ben_tag", dayName +" "+ average);
+                    case "Sunday":
+                        viewId = R.id.pbSunday;
+                        Log.i("ben_tag", dayName + " " + average);
                         break;
                 }
-                Log.i("ben_view id", " View ID: "+viewId);
-                ProgressBar bar =  findViewById(viewId);
+                Log.i("ben_view id", " View ID: " + viewId);
+                ProgressBar bar = findViewById(viewId);
                 bar.setProgress(average);
             }
         }
-
-    }
-
-
-
-    private void testGooglePlaceDb() {
-        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(this, GooglePlaceDatabase.getInstance(this));
-        List<GooglePlace> googlePlaces =
-                googlePlaceAccess.getAll();
-
-        if(googlePlaces.size() == 0){
-            //Llenar db con valores de testeo
-            GooglePlace googlePlace = new GooglePlace();
-            googlePlace.setLatitude(39.48305714751131f);
-            googlePlace.setLongitude(-0.34783486024869137f);
-            googlePlace.setCurrentPopularity(15);
-            googlePlace.setId("f");
-            googlePlace.setName("Efe");
-            googlePlaceAccess.add(googlePlace);
-
-            googlePlace = new GooglePlace();
-
-            googlePlace.setLatitude(39.48232417821347f);
-            googlePlace.setLongitude(-0.3487664561099621f);
-            googlePlace.setCurrentPopularity(10);
-            googlePlace.setId("f");
-            googlePlace.setName("Efe");
-            googlePlaceAccess.add(googlePlace);
-
-            googlePlace = new GooglePlace();
-
-            googlePlace.setLatitude(39.48281274006481f);
-            googlePlace.setLongitude(-0.3468889099088923f);
-            googlePlace.setCurrentPopularity(30);
-            googlePlace.setId("f");
-            googlePlace.setName("Efe");
-            googlePlaceAccess.add(googlePlace);
-
-            googlePlace = new GooglePlace();
-
-            googlePlace.setLatitude(39.483831256278556f);
-            googlePlace.setLongitude(-0.3468567234025883f);
-            googlePlace.setCurrentPopularity(20);
-            googlePlace.setId("f");
-            googlePlace.setName("Efe");
-            googlePlaceAccess.add(googlePlace);
-        }
-
-        googlePlaces = googlePlaceAccess.getAll();
-
-        Log.d("test db", googlePlaces.size() + "");
-        for (GooglePlace googlePlace : googlePlaces) {
-            Log.d("test db", googlePlace.getLatitude()+ ", " +googlePlace.getLongitude());
-        }
-    }
-
-    private void ejemploLlamadaApi(){
-        /*
-                    EJEMPLO DE LLAMADA A LA API.
-        */
-
-        PopularTimesService populartimesService =  PopularTimesService.getInstance();
-
-        Call<List<GooglePlace>> response2 = populartimesService.get(new ParametersPT(new String[]{"bar"},new double[]{48.132986, 11.566126},new double[]{48.142199, 11.580047,},60,90));
-        Call<GooglePlace> response  = populartimesService.get_id(new ParametersPT("ChIJSYuuSx9awokRyrrOFTGg0GY"));
-
-        response2.enqueue(new Callback<List<GooglePlace>>() {
-            @Override
-            public void onResponse(Call<List<GooglePlace>> call, Response<List<GooglePlace>> response) {
-
-                Log.d("Response List", response.body().get(0).getLatitude().toString());
-            }
-
-            @Override
-            public void onFailure(Call<List<GooglePlace>> call, Throwable t) {
-
-            }
-
-        });
-
-        response.enqueue(new Callback<GooglePlace>() {
-            @Override
-            public void onResponse(Call<GooglePlace> call, Response<GooglePlace> response) {
-                Log.d("Response", String.valueOf(response.body().getTimeWait()));
-            }
-
-            @Override
-            public void onFailure(Call<GooglePlace> call, Throwable t) {
-                Log.d("Response",t.getLocalizedMessage());
-            }
-        });
 
     }
 
@@ -327,6 +265,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i(TAG, "An error occurred: " + status);
             }
         });
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(binding.map.getId());
+        mapFragment.getMapAsync(this);
     }
 
     private void getLatLng(String placeId) {
@@ -336,67 +279,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         placesUtils.getLatLng(placeId);
     }
 
+    public void keyDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Google Api key");
 
-    private void clearDb() {
-        GooglePlaceAccess googlePlaceAccess = GooglePlaceAccess.getInstance(this,
-                GooglePlaceDatabase.getInstance(this));
-        SearchPlacesAccess searchPlacesAccess = SearchPlacesAccess.getInstance(this,
-                GooglePlaceDatabase.getInstance(this));
-        googlePlaceAccess.clearTable();
-        searchPlacesAccess.clearTable();
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setText(sharedPrefs.getString("apiKey", ""));
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                apiKey = input.getText().toString();
+                editor.putString("apiKey", apiKey);
+                initializePlaces(apiKey);
+
+                editor.apply();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (!sharedPrefs.getString("apiKey", "").equals("")) dialog.cancel();
+                else Toast.makeText(MapsActivity.this, "Pon un apikey", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.show();
     }
 
     public void openSavedMenu(View view) {
         SelectSavedSearchDialogFragment dialog = new SelectSavedSearchDialogFragment(mMap, mapsUtils);
         dialog.show(getSupportFragmentManager(), "selectSaved");
-    }
-
-    public static class SelectSavedSearchDialogFragment extends DialogFragment {
-        private List<SearchPlaces.SearchPlacesWithGooglePlaces> searchPlaces;
-        private GoogleMap mMap;
-        private MapsUtils mapsUtils;
-
-        public SelectSavedSearchDialogFragment(GoogleMap map, MapsUtils mapsUtils){
-            mMap = map;
-            this.mapsUtils = mapsUtils;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            SearchPlacesAccess searchPlacesAccess = SearchPlacesAccess.getInstance(getContext(),
-                    GooglePlaceDatabase.getInstance(getContext()));
-            searchPlaces = searchPlacesAccess.getAll();
-            // Use the Builder class for convenient dialog construction
-            CharSequence[] items = new CharSequence[searchPlaces.size()];
-            for(int i = 0; i < searchPlaces.size(); i++){
-                items[i] = searchPlaces.get(i).searchPlaces.getSearchedLocation();
-            }
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.dialogSelectTitle)
-                    .setItems(items, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            if(mapsUtils == null) mapsUtils = new MapsUtils(mMap);
-                            //mapsUtils.clearHeatMap();
-                            mapsUtils.clearMap();
-                            List<GooglePlace> googlePlaces = searchPlaces.get(which).googlePlaces;
-                            int average = PaintSearch.getAverage(googlePlaces);
-                            LatLng latLng = searchPlaces.get(which).searchPlaces.getLatLng();
-
-                            HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
-                            heatmapDrawer.drawCircle(latLng, average);
-
-                            PaintSearch.CustomInfoWindowAdapter infoWindowAdapter = new PaintSearch.CustomInfoWindowAdapter(LayoutInflater.from(getContext()),average);
-                            mMap.setInfoWindowAdapter(infoWindowAdapter);
-                            String name = searchPlaces.get(which).searchPlaces.getSearchedLocation();
-                            Marker lastMarker = mapsUtils.setMarker(latLng, name);
-                            lastMarker.showInfoWindow();
-                            //mapsUtils.addHeatMap(searchPlaces.get(which).googlePlaces);
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
-        }
-
     }
 
     /**
@@ -414,55 +332,67 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mapsUtils = new MapsUtils(mMap);
 
-        LatLng etsinf = new LatLng(39.48305714751131, -0.34783486024869137);
-        mapsUtils.setMarker(etsinf, "Etsinf");
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
 
-        List<GooglePlace> googlePlaces = mapsUtils.createPlaces(15, etsinf);
+            requestPermissions( new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 100);
+            return;
+        }
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        mapsUtils.addHeatMap(googlePlaces);
+        LatLng myLocation = new LatLng(location.getLongitude(), location.getLatitude());
 
-        //testGooglePlaceDb();
-        // clearDb();
+        mapsUtils.moveCamera(myLocation);
+    }
 
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    public static class SelectSavedSearchDialogFragment extends DialogFragment {
+        private List<SearchPlaces.SearchPlacesWithGooglePlaces> searchPlaces;
+        private GoogleMap mMap;
+        private MapsUtils mapsUtils;
 
-        /*
-        HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
-        GooglePlace googlePlace = new GooglePlace();
-        googlePlace.setLatitude(39.48305714751131f);
-        googlePlace.setLongitude(-0.34783486024869137f);
-        googlePlace.setCurrentPopularity(30);
-        //heatmapDrawer.drawCircle(googlePlace);
-        googlePlaces.add(googlePlace);
+        public SelectSavedSearchDialogFragment(GoogleMap map, MapsUtils mapsUtils) {
+            mMap = map;
+            this.mapsUtils = mapsUtils;
+        }
 
-        googlePlace = new GooglePlace();
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            SearchPlacesAccess searchPlacesAccess = SearchPlacesAccess.getInstance(getContext(),
+                    GooglePlaceDatabase.getInstance(getContext()));
+            searchPlaces = searchPlacesAccess.getAll();
+            // Use the Builder class for convenient dialog construction
+            CharSequence[] items = new CharSequence[searchPlaces.size()];
+            for (int i = 0; i < searchPlaces.size(); i++) {
+                items[i] = searchPlaces.get(i).searchPlaces.getSearchedLocation();
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.dialogSelectTitle)
+                    .setItems(items, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (mapsUtils == null) mapsUtils = new MapsUtils(mMap);
+                            //mapsUtils.clearHeatMap();
+                            mapsUtils.clearMap();
+                            List<GooglePlace> googlePlaces = searchPlaces.get(which).googlePlaces;
+                            int average = PaintSearch.getAverage(googlePlaces);
+                            LatLng latLng = searchPlaces.get(which).searchPlaces.getLatLng();
 
-        googlePlace.setLatitude(39.48232417821347f);
-        googlePlace.setLongitude(-0.3487664561099621f);
-        //heatmapDrawer.drawCircle(googlePlace);
-        googlePlaces.add(googlePlace);
-        googlePlace.setCurrentPopularity(30);
+                            HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
+                            heatmapDrawer.drawCircle(latLng, average);
 
-        googlePlace = new GooglePlace();
+                            PaintSearch.CustomInfoWindowAdapter infoWindowAdapter = new PaintSearch.CustomInfoWindowAdapter(LayoutInflater.from(getContext()), average);
+                            mMap.setInfoWindowAdapter(infoWindowAdapter);
+                            String name = searchPlaces.get(which).searchPlaces.getSearchedLocation();
+                            Marker lastMarker = mapsUtils.setMarker(latLng, name);
+                            lastMarker.showInfoWindow();
+                            //mapsUtils.addHeatMap(searchPlaces.get(which).googlePlaces);
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
 
-        googlePlace.setLatitude(39.48281274006481f);
-        googlePlace.setLongitude(-0.3468889099088923f);
-        //heatmapDrawer.drawCircle(googlePlace);
-        googlePlaces.add(googlePlace);
-        googlePlace.setCurrentPopularity(30);
-
-        googlePlace = new GooglePlace();
-
-        googlePlace.setLatitude(39.483831256278556f);
-        googlePlace.setLongitude(-0.3468567234025883f);
-        googlePlace.setCurrentPopularity(20);
-        //heatmapDrawer.drawCircle(googlePlace);
-        googlePlaces.add(googlePlace);
-
-        heatmapDrawer.makeHeatMap(googlePlaces);
-        */
     }
 }

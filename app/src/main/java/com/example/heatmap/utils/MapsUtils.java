@@ -71,17 +71,19 @@ public class MapsUtils {
      * @return the created marker
      */
     public Marker setMarker(LatLng latLng, String title) {
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.setMinZoomPreference(14.0f);
-        map.setMaxZoomPreference(20.0f);
+        moveCamera(latLng);
 
         int color = 0x4400ff00;
 
         return map.addMarker(new MarkerOptions().position(latLng).title(title));
     }
 
-
-
+    public void moveCamera(LatLng latLng) {
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13.0f));
+        map.setMinZoomPreference(5.0f);
+        map.setMaxZoomPreference(20.0f);
+    }
 
 
     /**
