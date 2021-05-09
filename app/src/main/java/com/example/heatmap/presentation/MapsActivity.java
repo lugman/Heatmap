@@ -76,7 +76,6 @@ import retrofit2.Response;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    // TODO: Change api key
     private String apiKey; // = BuildConfig.API_KEY;
     private ActivityMapsBinding binding;
     private GoogleMap mMap;
@@ -120,13 +119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         PaintSearch.setContext(this);
 
-        //testGooglePlaceDb();
-
-        //ejemploLlamadaApi();
-
         BottomFragment bottomFrag = BottomFragment.newInstance();
-        //    bottomFrag.show(getSupportFragmentManager(),"tag");
-
 
         //Create and initialize the fragment
 
@@ -134,15 +127,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Fragment bottomFragment = new BottomFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.infoFragmentHolder, BottomFragment.class, null).commit();
         bottomSheetBehavior = BottomSheetBehavior.from(bottomFragContainer);
-
-
-        //BottomFragmentBinding binding2 = BottomFragmentBinding.inflate(getLayoutInflater());
-        // binding2.tvMonday.setText("Set test 2");
-        // bottomSheetBehavior.isFitToContents = false;
-        //  bottomSheetBehavior.halfExpandedRatio = 0.6f;
-
-
-        // Log.i("tag binding name",binding.tvInfoLocale.getText().toString());
 
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -313,7 +297,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void openSavedMenu(View view) {
-        SelectSavedSearchDialogFragment dialog = new SelectSavedSearchDialogFragment(mMap, mapsUtils);
+        SelectSavedSearchDialogFragment dialog = new SelectSavedSearchDialogFragment(mMap, mapsUtils, this);
         dialog.show(getSupportFragmentManager(), "selectSaved");
     }
 
@@ -346,53 +330,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng myLocation = new LatLng(location.getLongitude(), location.getLatitude());
 
         mapsUtils.moveCamera(myLocation);
-    }
-
-    public static class SelectSavedSearchDialogFragment extends DialogFragment {
-        private List<SearchPlaces.SearchPlacesWithGooglePlaces> searchPlaces;
-        private GoogleMap mMap;
-        private MapsUtils mapsUtils;
-
-        public SelectSavedSearchDialogFragment(GoogleMap map, MapsUtils mapsUtils) {
-            mMap = map;
-            this.mapsUtils = mapsUtils;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            SearchPlacesAccess searchPlacesAccess = SearchPlacesAccess.getInstance(getContext(),
-                    GooglePlaceDatabase.getInstance(getContext()));
-            searchPlaces = searchPlacesAccess.getAll();
-            // Use the Builder class for convenient dialog construction
-            CharSequence[] items = new CharSequence[searchPlaces.size()];
-            for (int i = 0; i < searchPlaces.size(); i++) {
-                items[i] = searchPlaces.get(i).searchPlaces.getSearchedLocation();
-            }
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.dialogSelectTitle)
-                    .setItems(items, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (mapsUtils == null) mapsUtils = new MapsUtils(mMap);
-                            //mapsUtils.clearHeatMap();
-                            mapsUtils.clearMap();
-                            List<GooglePlace> googlePlaces = searchPlaces.get(which).googlePlaces;
-                            int average = PaintSearch.getAverage(googlePlaces);
-                            LatLng latLng = searchPlaces.get(which).searchPlaces.getLatLng();
-
-                            HeatmapDrawer heatmapDrawer = new HeatmapDrawer(mMap);
-                            heatmapDrawer.drawCircle(latLng, average);
-
-                            PaintSearch.CustomInfoWindowAdapter infoWindowAdapter = new PaintSearch.CustomInfoWindowAdapter(LayoutInflater.from(getContext()), average);
-                            mMap.setInfoWindowAdapter(infoWindowAdapter);
-                            String name = searchPlaces.get(which).searchPlaces.getSearchedLocation();
-                            Marker lastMarker = mapsUtils.setMarker(latLng, name);
-                            lastMarker.showInfoWindow();
-                            //mapsUtils.addHeatMap(searchPlaces.get(which).googlePlaces);
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
-        }
-
     }
 }
