@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">heatmap</string>
-    <string name="title_activity_maps">Map</string>ç
+    <string name="title_activity_maps">HeatMap</string>ç
 
     <string name="titleNotFound">No se ha encontrado información</string>
     <string name="descNotFound">No se ha podido encontrar información sobre el lugar indicado\n¿Desea obtener una aproximación con los lugares circundantes?</string>
