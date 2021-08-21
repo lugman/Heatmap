@@ -8,7 +8,7 @@ Su funcionamiento sería el siguiente, dada una ubicación introducida por el us
 
 Esta aplicación hace uso del patron de diseño model-view-presenter. Para su realización hace uso de la librería: [populartimes](https://github.com/m-wrzr/populartimes). La cual haced de interfaz con los servicios de googel para obtener los datos de las distintas ocupaciones de los locales. librería que esta en python y fue consumida a modo de consulta como un servicio rest, para lo cual usamos retrofit2 como librería de apoyo para las conexiones con este servidor.
 
-[Presentación](https://github.com/lugman/Heatmap/blob/master/Presentacion.pdf)
+[--> - Ver Presentación](https://github.com/lugman/Heatmap/blob/master/Presentacion.pdf)
 
 Demo:
 [![Ver](https://github.com/lugman/heatmap/blob/master/demo-img-video.png)](https://www.youtube.com/watch?v=eS5DTPN3TqA)
